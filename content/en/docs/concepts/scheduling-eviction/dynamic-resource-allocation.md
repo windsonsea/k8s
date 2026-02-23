@@ -449,10 +449,16 @@ spec:
 You may also be able to mutate the incoming Pod, at admission time, to unset
 the `.spec.nodeName` field and to use a node selector instead.
 
-## DRA beta features {#beta-features}
+## Additional DRA features
 
-The following sections describe DRA features that are available in the Beta
+The following sections describe DRA features that support advanced use
+cases. Usage of them is optional and may only be relevant with DRA
+drivers that support them.
+
+Some of them are available in the Alpha or Beta
 [feature stage](/docs/reference/command-line-tools-reference/feature-gates/#feature-stages).
+Those depend on feature gates and may depend on additional
+{{< glossary_tooltip text="API groups" term_id="api-group" >}}.
 For more information, see
 [Set up DRA in the cluster](/docs/tasks/configure-pod-container/assign-resources/set-up-dra-cluster/).
 
@@ -481,15 +487,12 @@ spec:
           adminAccess: true
 ```
 
-If this feature is disabled, the `adminAccess` field will be removed
-automatically when creating such a ResourceClaim.
-
 Admin access is a privileged mode and should not be granted to regular users in
-multi-tenant clusters. Starting with Kubernetes v1.33, only users authorized to
+multi-tenant clusters. Only users authorized to
 create ResourceClaim or ResourceClaimTemplate objects in namespaces labeled with
-`resource.k8s.io/admin-access: "true"` (case-sensitive) can use the `adminAccess` field.
-This ensures that non-admin users cannot misuse the feature.
-Starting with Kubernetes v1.34, this label has been updated to `resource.kubernetes.io/admin-access: "true"`.
+`resource.kubernetes.io/admin-access: "true"` (case-sensitive) can use the
+`adminAccess` field. This ensures that non-admin users cannot misuse the
+feature.
 
 ### Extended resource allocation by DRA {#extended-resource}
 
