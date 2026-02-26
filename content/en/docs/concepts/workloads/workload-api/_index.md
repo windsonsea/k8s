@@ -39,6 +39,8 @@ Each entry in `podGroups` must have:
 1. A unique `name` that can be used in the Pod's [Workload reference](/docs/concepts/workloads/pods/workload-reference/).
 2. A [scheduling policy](/docs/concepts/workloads/workload-api/policies/) (`basic` or `gang`).
 
+If the [`WorkloadAwarePreemption`](/docs/reference/command-line-tools-reference/feature-gates/#WorkloadAwarePreemption) [feature gate](/docs/reference/command-line-tools-reference/feature-gates/) is enabled each entry in `podGroups` can also have [priority and disruption mode](/docs/concepts/workloads/workload-api/disruption-and-priority/).
+
 ```yaml
 apiVersion: scheduling.k8s.io/v1alpha1
 kind: Workload
@@ -56,6 +58,8 @@ spec:
       gang:
         # The gang is schedulable only if 4 pods can run at once
         minCount: 4
+    priorityClassName: high-priority # Only applicable with WorkloadAwarePreemption feature gate
+    disruptionMode: PodGroup # Only applicable with WorkloadAwarePreemption feature gate
 ```
 
 ### Referencing a workload controlling object
