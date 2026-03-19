@@ -607,9 +607,9 @@ spec:
           value: 6Gi
 ```
 
-Partitionable devices is an *alpha feature* and only enabled when the
+Partitionable devices is a *beta feature* and enabled when the
 [`DRAPartitionableDevices` feature gate](/docs/reference/command-line-tools-reference/feature-gates/#DRAPartitionableDevices)
-is enabled in the kube-apiserver and kube-scheduler.
+is kept enabled in the kube-apiserver and kube-scheduler.
 
 ## Consumable capacity
 
