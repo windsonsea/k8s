@@ -11,9 +11,10 @@ Gang scheduling ensures that a group of Pods are scheduled on an "all-or-nothing
 If the cluster cannot accommodate the entire group (or a defined minimum number of Pods),
 none of the Pods are bound to a node.
 
-This feature depends on the [Workload API](/docs/concepts/workloads/workload-api/).
-Ensure the [`GenericWorkload`](/docs/reference/command-line-tools-reference/feature-gates/#GenericWorkload)
-feature gate and the `scheduling.k8s.io/v1alpha1`
+This feature depends on the [PodGroup API](/docs/concepts/workloads/podgroup-api/) and the
+[Workload API](/docs/concepts/workloads/workload-api/).
+Ensure the  [`GenericWorkload`](/docs/reference/command-line-tools-reference/feature-gates/#GenericWorkload)
+feature gate and the `scheduling.k8s.io/v1alpha2`
 {{< glossary_tooltip text="API group" term_id="api-group" >}} are enabled in the cluster.
 
 <!-- body -->
@@ -21,17 +22,15 @@ feature gate and the `scheduling.k8s.io/v1alpha1`
 ## How it works
 
 When the `GangScheduling` plugin is enabled, the scheduler alters the lifecycle for Pods belonging
-to a `gang` [pod group policy](/docs/concepts/workloads/workload-api/policies/) within
-a [Workload](/docs/concepts/workloads/workload-api/).
-The process follows these steps independently for each pod group and its replica key:
+to a [PodGroup](/docs/concepts/workloads/podgroup-api/) that has a `gang`
+[scheduling policy](/docs/concepts/workloads/workload-api/policies/).
+The process follows these steps for each PodGroup:
 
 1. The scheduler holds Pods in the `PreEnqueue` phase until:
-   * The referenced Workload object is created.
-   * The referenced pod group exists in a Workload.
-   * The number of Pods that have been created for the specific group
-     is at least equal to the `minCount`.
+   * The referenced `PodGroup` object exists.
+   * The number of `Pods` created for the `PodGroup` is at least equal to `minCount`.
 
-   Pods do not enter the active scheduling queue until all of these conditions are met.
+   `Pods` do not enter the active scheduling queue until both conditions are met.
 
 2. Once the quorum is met, the scheduler attempts to find placements for all Pods in the group.
    It utilizes the [PodGroup scheduling](/docs/concepts/scheduling-eviction/podgroup-scheduling/) cycle to make a single,
@@ -45,8 +44,25 @@ The process follows these steps independently for each pod group and its replica
    Instead, they are moved to the unschedulable queue to wait for cluster resources to free up,
    allowing other workloads to be scheduled in the meantime.
 
+## PodGroupScheduled condition
+
+After the gang scheduling attempt completes, the scheduler updates the
+`PodGroupScheduled` condition on the PodGroup:
+
+* `True` — at least `minCount` Pods were successfully placed.
+* `False` with reason `Unschedulable` — the group could not be placed due to
+  resource constraints, affinity or anti-affinity rules, or insufficient capacity for the gang.
+* `False` with reason `SchedulerError` — scheduling failed because of an internal scheduler
+  error (for example, while parsing scheduling constraints such as `nodeAffinity`).
+
+You can check the condition with:
+
+```shell
+kubectl get podgroup <name> -o jsonpath='{.status.conditions}'
+```
+
 ## {{% heading "whatsnext" %}}
 
-* Learn about the [Workload API](/docs/concepts/workloads/workload-api/).
-* See how to [reference a Workload](/docs/concepts/workloads/pods/workload-reference/) in a Pod.
+* Learn about the [PodGroup API](/docs/concepts/workloads/podgroup-api/) and its [lifecycle](/docs/concepts/workloads/podgroup-api/lifecycle/).
+* Read about [PodGroup scheduling policies](/docs/concepts/workloads/workload-api/policies/) (`basic` and `gang`).
 * Read about [PodGroup scheduling](/docs/concepts/scheduling-eviction/podgroup-scheduling/).

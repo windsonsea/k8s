@@ -1,7 +1,7 @@
 ---
 title: "PodGroup API"
 weight: 25
-simple_list: true
+no_list: true
 ---
 
 <!-- overview -->

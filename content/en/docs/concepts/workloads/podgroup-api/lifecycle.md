@@ -7,10 +7,8 @@ weight: 10
 <!-- overview -->
 {{< feature-state feature_gate_name="GenericWorkload" >}}
 
-A `PodGroup` represents a runtime instance of Pods grouped together for scheduling.
-Workload controllers (i.e., Job, etc...) create `PodGroups` from
-[Workload](/docs/concepts/workloads/workload-api/) `PodGroupTemplates`.
-Each `PodGroup` is a self-contained scheduling unit with its own policy and status.
+A [PodGroup](/docs/concepts/workloads/podgroup-api/) is scheduled as a unit and protected
+from premature deletion while its Pods are still running.
 
 <!-- body -->
 
@@ -54,6 +52,8 @@ For advanced use cases, you can create `PodGroup` objects directly and set
 
 * All Pods in a `PodGroup` must use the same `.spec.schedulerName`.
   If a mismatch is detected, the scheduler rejects all Pods in the group as unschedulable.
+* The `spec.schedulingPolicy.gang.minCount` field on a PodGroup is immutable.
+  Once created, you cannot change the minimum number of Pods that must be schedulable for the group to be admitted.
 * The `spec.schedulingGroup` field on a Pod is immutable.
   Once set, a Pod cannot move to a different PodGroup.
 * The maximum number of `PodGroupTemplates` in a single `Workload` is 8.
