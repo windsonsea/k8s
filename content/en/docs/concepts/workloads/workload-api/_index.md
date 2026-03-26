@@ -70,4 +70,5 @@ TBD: Add section on desired count and topology aware scheduling
 
 * See how to [reference a Workload](/docs/concepts/workloads/pods/workload-reference/) in a Pod.
 * Learn about [pod group policies](/docs/concepts/workloads/workload-api/policies/).
+* Learn about [Topology-aware workload scheduling](/docs/concepts/workloads/workload-api/topology-aware-scheduling/).
 * Read about [gang scheduling](/docs/concepts/scheduling-eviction/gang-scheduling/) algorithm.
