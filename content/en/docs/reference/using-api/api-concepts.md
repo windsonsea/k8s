@@ -881,7 +881,9 @@ For example: `Accept: application/json;as=PartialObjectMetadata;g=meta.k8s.io;v=
 for JSON for a specific object and: 
 `Accept: application/json;as=PartialObjectMetadataList;g=meta.k8s.io;v=v1` for a list.
 
-NOTE: `as=PartialObjectMetadata;` should be used in specific object requests and `as=PartialObjectMetadataList;` should be used for lists.
+{{< note >}}
+`as=PartialObjectMetadata` should be used in specific resource requests, and `as=PartialObjectMetadataList` should be used for lists.
+{{< /note >}}
 
 For example, to list all of the pods in a cluster, across all namespaces, but returning only the metadata for each pod:
 
