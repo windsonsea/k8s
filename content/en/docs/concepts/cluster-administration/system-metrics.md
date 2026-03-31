@@ -179,7 +179,7 @@ flag to expose these alpha stability metrics.
 
 {{< feature-state feature_gate_name="KubeletPSI" >}}
 
-As a stable feature, the kubelet collects Linux kernel
+The kubelet collects Linux kernel
 [Pressure Stall Information](https://docs.kernel.org/accounting/psi.html)
 (PSI) for CPU, memory and I/O usage.
 The information is collected at node, pod and container level.
