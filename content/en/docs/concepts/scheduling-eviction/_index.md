@@ -26,6 +26,7 @@ of terminating one or more Pods on Nodes.
 * [Pod Scheduling Readiness](/docs/concepts/scheduling-eviction/pod-scheduling-readiness/)
 * [PodGroup Scheduling](/docs/concepts/scheduling-eviction/podgroup-scheduling/)
 * [Gang Scheduling](/docs/concepts/scheduling-eviction/gang-scheduling/)
+* [Topology-aware Scheduling](/docs/concepts/scheduling-eviction/topology-aware-scheduling/)
 * [Descheduler](https://github.com/kubernetes-sigs/descheduler#descheduler-for-kubernetes)
 * [Node Declared Features](/docs/concepts/scheduling-eviction/node-declared-features/)
 
