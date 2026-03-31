@@ -3,7 +3,7 @@ title: kubectl config delete-cluster
 content_type: tool-reference
 weight: 30
 description: >-
-  从 kubeconfig 文件中删除指定的集群。
+  从 kubeconfig 中删除指定的集群
 ---
 <!--
 title: kubectl config delete-cluster
