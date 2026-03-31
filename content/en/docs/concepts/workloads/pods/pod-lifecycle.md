@@ -718,6 +718,7 @@ condition to `True` before sandbox creation and network configuration starts.
 ## Resizing Pods {#pod-resize}
 
 {{< feature-state feature_gate_name="InPlacePodVerticalScaling" >}}
+{{< feature-state feature_gate_name="InPlacePodLevelResourcesVerticalScaling" >}}
 
 Kubernetes supports changing the CPU and memory resources allocated to Pods
 after they are created. (For other infrastructure resources, you would need to
@@ -729,6 +730,9 @@ approaches to resizing CPU and memory:
 You can resize a Pod's container-level CPU and memory resources without recreating the Pod.
 This is also called _in-place Pod vertical scaling_. This allows you to adjust resource
 allocation for running containers while potentially avoiding application disruption.
+
+If you have specified resources at the pod-level, you can also resize those in-place.
+For more details, see [Resize CPU and Memory Resources assigned to Pods](/docs/tasks/configure-pod-container/resize-pod-resources/).
 
 To perform an in-place resize, you update the Pod's desired state using the `/resize`
 subresource. The kubelet then attempts to apply the new resource values to the running
