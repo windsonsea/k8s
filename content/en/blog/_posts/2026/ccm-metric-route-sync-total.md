@@ -26,6 +26,32 @@ To A/B test this, compare `route_controller_route_sync_total` with the feature g
 disabled (default) versus enabled. In clusters where node changes are infrequent, you should
 see a significant drop in the sync rate with the feature gate turned on.
 
+### Example: expected behavior
+
+**With the feature gate disabled** (the default fixed-interval loop), the counter increments
+steadily regardless of whether any node changes occurred:
+
+```
+# After 10 minutes with no node changes
+route_controller_route_sync_total 60
+# After 20 minutes, still no node changes
+route_controller_route_sync_total 120
+```
+
+**With the feature gate enabled** (watch-based reconciliation), the counter only increments
+when nodes are actually added, removed, or updated:
+
+```
+# After 10 minutes with no node changes
+route_controller_route_sync_total 1
+# After 20 minutes, still no node changes — counter unchanged
+route_controller_route_sync_total 1
+# A new node joins the cluster — counter increments
+route_controller_route_sync_total 2
+```
+
+The difference is especially visible in stable clusters where nodes rarely change.
+
 ## Where can I give feedback?
 
 If you have feedback, feel free to reach out through any of the following channels:
