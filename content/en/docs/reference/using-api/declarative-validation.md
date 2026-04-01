@@ -20,7 +20,7 @@ optimized Go code for API validation.
 
 While primarily a feature impacting Kubernetes contributors and potentially developers of [extension API servers](/docs/concepts/extend-kubernetes/api-extension/apiserver-aggregation/), cluster administrators should understand its behavior, especially during its rollout phases.
 
-Declarative validation tags can apply directly to net-new API fields without requiring any lifecycle mechanism (eg: can just use `+k8s:minimum=1`). For migrating existing hand-written validations where the declarative validation is shadowing the existing hand-written validation logic, the rollout is controlled by the validation lifecycle tags (`+k8s:alpha` and `+k8s:beta`) alongside the `DeclarativeValidationBeta` feature gate:
+Declarative validation tags can apply directly to net-new API fields without requiring any lifecycle mechanism (for example, it is possible to use `+k8s:minimum=1`). For migrating existing hand-written validations where the declarative validation is shadowing the existing hand-written validation logic, the rollout is controlled by the validation lifecycle tags (`+k8s:alpha` and `+k8s:beta`) alongside the `DeclarativeValidationBeta` feature gate:
 
 *   `DeclarativeValidation`: (GA in v1.36, Default: `true`, LockToDefault: `true`) The API server runs *both* the new declarative validation and the old hand-written validation for migrated types/fields in "shadow mode" (Alpha). The results are compared internally.
 *   `DeclarativeValidationBeta`: (Beta, Default: `true`) Introduced in v1.36. This gate controls the enforcement of beta-stage validation rules. When enabled, rules marked as `+k8s:beta` are authoritative; when disabled, they revert to shadow mode.
