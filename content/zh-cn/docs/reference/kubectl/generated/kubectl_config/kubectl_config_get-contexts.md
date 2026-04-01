@@ -39,8 +39,8 @@ kubectl config get-contexts my-context
 ```shell
 # 列出 kubeconfig 文件中的所有上下文
 kubectl config get-contexts
-
-# 描述 kubeconfig 文件中指定上下文的详细信息
+  
+# 描述 kubeconfig 文件中的一个上下文
 kubectl config get-contexts my-context
 ```
 
