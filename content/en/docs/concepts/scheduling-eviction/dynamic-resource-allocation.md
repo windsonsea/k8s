@@ -305,6 +305,19 @@ cluster can access the devices. There's one device in the ResourceSlice, named
 A DeviceClass could select this ResourceSlice by using these attributes, and a
 ResourceClaim could filter for specific devices in that DeviceClass.
 
+#### Naming and prioritization {#resourceslice-naming-and-prioritization}
+
+ResourceSlices are named by the controller using an index-based convention:
+`[encoded index]-[driver name]-[owner name]-`. The `[encoded index]` is a
+hexadecimal string that represents the slice's order in the pool as specified by
+the driver.
+
+When allocating resources, the scheduler's allocator sorts ResourceSlices and
+pools lexicographically by name and uses a first-fit search strategy. This
+allows driver authors to influence the priority of resource allocation by
+ordering their slices and pools accordingly. Note that pools without binding
+conditions are considered before those with binding conditions.
+
 ## How resource allocation with DRA works {#how-it-works}
 
 The following sections describe the workflow for the various
@@ -349,7 +362,10 @@ dynamic resource allocation.
 
 1. **Resource allocation**: after finding an eligible ResourceSlice for a
    Pod's ResourceClaim, the Kubernetes scheduler updates the ResourceClaim
-   with the allocation details.
+   with the allocation details. The scheduler uses a first-fit strategy and
+   evaluates pools and ResourceSlices in lexicographical order by their names.
+   Drivers can prioritize specific slices or pools by ordering them appropriately
+   when publishing. For details, see [Naming and prioritization](#resourceslice-naming-and-prioritization).
 1. **Pod scheduling**: when resource allocation is complete, the scheduler
    places the Pod on a node that can access the allocated resource. The device
    driver and the kubelet on that node configure the device and the Pod's access
