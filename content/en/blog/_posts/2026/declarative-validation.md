@@ -1,7 +1,8 @@
 ---
 layout: blog
-title: "Kubernetes v1.36: Declarative Validation Reaches General Availability"
+title: "Kubernetes v1.36: Declarative Validation Graduates to GA"
 date: 2026-03-23T10:00:00-08:00
+draft: true
 slug: kubernetes-v1-36-declarative-validation-ga
 author: >
   [Yongrui Lin](https://github.com/yongruilin)
@@ -36,10 +37,10 @@ These generated functions are then registered seamlessly with the API scheme. Th
 
 ### A Comprehensive Suite of +k8s: Tags
 
-The declarative validation framework introduces a comprehensive suite of marker tags that provide rich validation capabilities highly optimized for Go types. Here is a catalog of some of the most common tags you will now see in the Kubernetes codebase:
+The declarative validation framework introduces a comprehensive suite of marker tags that provide rich validation capabilities highly optimized for Go types. For a full list of supported tags, check out the [official documentation](https://kubernetes.io/docs/reference/using-api/declarative-validation/#declarative-validation-tag-reference). Here is a catalog of some of the most common tags you will now see in the Kubernetes codebase:
 
-*   **Presence and Defaults:** `+k8s:optional`, `+k8s:required`, `+k8s:default=...`
-*   **Basic Constraints:** `+k8s:minimum=0`, `+k8s:maximum=100`, `+k8s:maxLength=16`, `+k8s:format=dns-label`
+*   **Presence:** `+k8s:optional`, `+k8s:required`
+*   **Basic Constraints:** `+k8s:minimum=0`, `+k8s:maximum=100`, `+k8s:maxLength=16`, `+k8s:format=k8s-short-name`
 *   **Collections:** `+k8s:listType=map`, `+k8s:listMapKey=type`
 *   **Unions:** `+k8s:unionMember`, `+k8s:unionDiscriminator`
 *   **Immutability:** `+k8s:immutable`, `+k8s:update=[NoSet, NoModify, NoClear]`
@@ -66,30 +67,18 @@ The problem was that a global "all-or-nothing" switch blocked the graduation of 
 
 To solve this, Kubernetes v1.36 finalizes the **Lifecycle Tags** model, which allows granular, field-level promotion of validation rules:
 *   **`+k8s:alpha`:** Runs in shadow mode. The declarative rule is evaluated, and if it mismatches with the legacy handwritten rule, a metric (`declarative_validation_mismatch_total`) is emitted, but the error is suppressed.
-*   **`+k8s:beta`:** Enforced by default, but can be globally bypassed if a catastrophic regression occurs.
+*   **`+k8s:beta`:** Enforced by default. If the `DeclarativeValidationBeta` feature gate is disabled, these declarative validations are skipped and the legacy handwritten validations are enforced instead.
 *   **No prefix (Stable/GA):** The rule is permanently enforced, and the corresponding legacy handwritten code is deleted.
 
 This granular lifecycle is the key mechanism that allowed declarative validation to reach GA safely.
 
 ---
 
-## Advanced Capabilities: Ratcheting and Cross-Field Validation
+## Advanced Capabilities: Validation Ratcheting
 
-Declarative validation isn't just about simple minimums and maximums; it brings sophisticated, production-grade validation strategies to the table.
-
-### Validation Ratcheting
-
-One of the most critical safety mechanisms in Kubernetes API updates is ensuring that new or stricter validation rules do not break existing, "grandfathered" objects. This is where **Validation Ratcheting** comes in.
+Declarative validation isn't just about simple minimums and maximums; it brings sophisticated, production-grade validation strategies to the table. One of the most critical safety mechanisms in Kubernetes API updates is ensuring that new or stricter validation rules do not break existing, "grandfathered" objects. This is where **Validation Ratcheting** comes in.
 
 If a user updates an existing object, the validation framework compares the incoming object with the `oldObject`. If a specific field's value is semantically equivalent to its prior state (i.e., the user didn't change it), the new validation rule is bypassed. This allows us to tighten validation rules for new creations or modifications without bricking objects that were created before the rule existed.
-
-### Cross-Field Validation
-
-Many Kubernetes APIs have rules that depend on the state of multiple fields (e.g., `FieldA` must be less than `FieldB`). The declarative framework handles this through **Cross-Field Validation**.
-
-While tags are placed on individual fields, `validation-gen` intelligently "hoists" the validation logic to the common ancestor struct during code generation. The framework uses two primary referencing strategies:
-1.  **Field Paths:** Direct dot-notation references (e.g., `+k8s:minimum(constraint: minValue)`).
-2.  **Virtual Fields:** Identifier-based references designed for complex relationships like unions (e.g., `+k8s:memberOf(group: terminalStatus)`).
 
 
 ---
@@ -103,9 +92,9 @@ Reaching GA requires absolute confidence that the generated validation code beha
 
 ### What's Next?
 
-With the release of Kubernetes v1.36, Declarative Validation graduates to General Availability (GA). As a stable feature, the associated `DeclarativeValidation` feature gate is now unconditionally enabled. It has become the standard mechanism for adding new validation rules to Kubernetes native types.
+With the release of Kubernetes v1.36, Declarative Validation graduates to General Availability (GA). As a stable feature, the associated `DeclarativeValidation` feature gate is now enabled by default. It has become the primary mechanism for adding new validation rules to Kubernetes native types.
 
-Looking forward, the project is committed to adopting declarative validation even more extensively. This includes migrating the remaining legacy handwritten validation code for established APIs and ensuring that all new APIs leverage this framework from day one. This ongoing transition will continue to shrink the codebase's complexity while enhancing the consistency and reliability of the entire Kubernetes API surface.
+Looking forward, the project is committed to adopting declarative validation even more extensively. This includes migrating the remaining legacy handwritten validation code for established APIs and encouraging its use for all new APIs and fields. This ongoing transition will continue to shrink the codebase's complexity while enhancing the consistency and reliability of the entire Kubernetes API surface.
 
 ## Getting Involved
 
