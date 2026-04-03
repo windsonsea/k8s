@@ -9,6 +9,7 @@ author: >
   Antoni Zawodny (Google),
   Matt Matejczyk (Google),
   Bartosz Rejman (Google),
+  Jon Huhn (Microsoft),
   TBD
 ---
 
@@ -210,7 +211,76 @@ TBD
 
 ## DRA ResourceClaim support for workloads
 
-TBD
+Since its general availability in Kubernetes v1.34, {{< glossary_tooltip text="DRA" term_id="dra" >}}
+has enabled Pods to make detailed requests for {{<glossary_tooltip text="devices" term_id="device" >}}
+like GPUs, TPUs, and NICs. Requested devices can be shared by multiple Pods
+requesting the same {{< glossary_tooltip text="ResourceClaim" term_id="resourceclaim" >}}
+by name. Other requests can be replicated through a {{< glossary_tooltip text="ResourceClaimTemplate" term_id="resourceclaimtemplate" >}}
+in which Kubernetes generates one ResourceClaim with a non-deterministic name
+for each Pod referencing the template. Large-scale workloads that require
+certain Pods to share certain devices currently are left to manage creating
+individual ResourceClaims themselves.
+
+Now, in addition to Pods, PodGroups can represent the replicable unit for a
+ResourceClaimTemplate. For ResourceClaimTemplates referenced by one of a
+PodGroup's `spec.resourceClaims`, Kubernetes generates one ResourceClaim for the
+entire PodGroup, no matter how many Pods are in the group. When one of a Pod's
+`spec.resourceClaims` for a ResourceClaimTemplate matches one of its PodGroup's
+`spec.resourceClaims`, the Pod's claim resolves to the ResourceClaim generated
+for the PodGroup and a ResourceClaim will not be generated for that individual
+Pod. A single PodGroupTemplate in a Workload object can express resource
+requests which are both copied for each distinct PodGroup and shareable by the
+Pods within each group.
+
+The following example shows two Pods requesting the same ResourceClaim generated
+from a ResourceClaimTemplate for their PodGroup:
+
+```yaml
+apiVersion: scheduling.k8s.io/v1alpha2
+kind: PodGroup
+metadata:
+  name: training-job-workers-pg
+spec:
+  ...
+  resourceClaims:
+    - name: pg-claim
+      resourceClaimTemplateName: my-claim-template
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: topology-aware-workers-pg-pod-1
+spec:
+  ...
+  schedulingGroup:
+    podGroupName: training-job-workers-pg
+  resourceClaims:
+    - name: pg-claim
+      resourceClaimTemplateName: my-claim-template
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: topology-aware-workers-pg-pod-2
+spec:
+  ...
+  schedulingGroup:
+    podGroupName: training-job-workers-pg
+  resourceClaims:
+    - name: pg-claim
+      resourceClaimTemplateName: my-claim-template
+```
+
+In addition, ResourceClaims referenced by PodGroups either through
+`resourceClaimName` or the claim generated from `resourceClaimTemplateName`
+become reserved for the entire PodGroup. Previously, kube-scheduler could only
+list individual Pods in a ResourceClaim's `status.reservedFor` field which is
+limited to 256 items. Now, a single PodGroup reference in `status.reservedFor`
+can represent many more than 256 Pods, allowing high-cardinality sharing of
+devices.
+
+Together, these changes enable massive workloads with complex topologies to
+utilize DRA for scalable device management.
 
 ## Integration with the Job controller
 
