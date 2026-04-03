@@ -19,6 +19,8 @@ api_metadata:
 - apiVersion: "resource.k8s.io/v1beta1"
   kind: "ResourceSlice"
 - apiVersion: "resource.k8s.io/v1beta2"
+  kind: "DeviceTaintRule"
+- apiVersion: "resource.k8s.io/v1beta2"
   kind: "ResourceClaim"
 - apiVersion: "resource.k8s.io/v1beta2"
   kind: "ResourceClaimTemplate"
@@ -386,8 +388,8 @@ The accuracy of the information that a driver adds to a ResourceClaim
 `status.devices` field depends on the driver. Evaluate drivers to decide whether
 you can rely on this field as the only source of device information.
 
-If you disable the `DRAResourceClaimDeviceStatus`
-[feature gate](/docs/reference/command-line-tools-reference/feature-gates/), the
+If you disable the
+[`DRAResourceClaimDeviceStatus` feature gate](/docs/reference/command-line-tools-reference/feature-gates/#DRAResourceClaimDeviceStatus), the
 `status.devices` field automatically gets cleared when storing the ResourceClaim.
 A ResourceClaim device status is supported when it is possible, from a DRA
 driver, to update an existing ResourceClaim where the `status.devices` field is
@@ -404,7 +406,7 @@ As an alpha feature, Kubernetes provides a mechanism for monitoring and reportin
 For stateful applications running on specialized hardware, it is critical to know when a device has failed or become unhealthy.
 It is also helpful to find out if the device recovers.
 
-To enable this functionality, the `ResourceHealthStatus` [feature gate](/docs/reference/command-line-tools-reference/feature-gates/ResourceHealthStatus/)
+To enable this functionality, the [`ResourceHealthStatus` feature gate](/docs/reference/command-line-tools-reference/feature-gates/#ResourceHealthStatus)
 must be enabled, and the DRA driver must implement the `DRAResourceHealth` gRPC service.
 
 When a DRA driver detects that an allocated device has become unhealthy, it reports this status back to the kubelet.
@@ -449,10 +451,16 @@ spec:
 You may also be able to mutate the incoming Pod, at admission time, to unset
 the `.spec.nodeName` field and to use a node selector instead.
 
-## DRA beta features {#beta-features}
+## Additional DRA features
 
-The following sections describe DRA features that are available in the Beta
+The following sections describe DRA features that support advanced use
+cases. Usage of them is optional and may only be relevant with DRA
+drivers that support them.
+
+Some of them are available in the Alpha or Beta
 [feature stage](/docs/reference/command-line-tools-reference/feature-gates/#feature-stages).
+Those depend on feature gates and may depend on additional
+{{< glossary_tooltip text="API groups" term_id="api-group" >}}.
 For more information, see
 [Set up DRA in the cluster](/docs/tasks/configure-pod-container/assign-resources/set-up-dra-cluster/).
 
@@ -491,6 +499,10 @@ create ResourceClaim or ResourceClaimTemplate objects in namespaces labeled with
 This ensures that non-admin users cannot misuse the feature.
 Starting with Kubernetes v1.34, this label has been updated to `resource.kubernetes.io/admin-access: "true"`.
 
+Admin access is a *beta feature* and is enabled by default with the
+[`DRAAdminAccess` feature gate](/docs/reference/command-line-tools-reference/feature-gates/#DRAAdminAccess)
+in the kube-apiserver, kube-scheduler, and kubelet.
+
 ### Extended resource allocation by DRA {#extended-resource}
 
 {{< feature-state feature_gate_name="DRAExtendedResource" >}}
@@ -527,17 +539,8 @@ The resulting ResourceClaim will contain a request for an `ExactCount` of the
 specified number of devices of that DeviceClass.
 
 Extended resource allocation by DRA is a *beta feature* and is enabled by default with the 
-`DRAExtendedResource` [feature gate](/docs/reference/command-line-tools-reference/feature-gates/#DRAExtendedResource)
+[`DRAExtendedResource` feature gate](/docs/reference/command-line-tools-reference/feature-gates/#DRAExtendedResource)
 in the kube-apiserver, kube-scheduler, kube-controller-manager, and kubelet.
-
-## DRA alpha features {#alpha-features}
-
-The following sections describe DRA features that are available in the Alpha
-[feature stage](/docs/reference/command-line-tools-reference/feature-gates/#feature-stages).
-They depend on enabling feature gates and may depend on additional
-{{< glossary_tooltip text="API groups" term_id="api-group" >}}.
-For more information, see
-[Set up DRA in the cluster](/docs/tasks/configure-pod-container/assign-resources/set-up-dra-cluster/).
 
 ### Partitionable devices {#partitionable-devices}
 
@@ -607,8 +610,8 @@ spec:
           value: 6Gi
 ```
 
-Partitionable devices is an *alpha feature* and only enabled when the `DRAPartitionableDevices`
-[feature gate](/docs/reference/command-line-tools-reference/feature-gates/)
+Partitionable devices is an *alpha feature* and only enabled when the
+[`DRAPartitionableDevices` feature gate](/docs/reference/command-line-tools-reference/feature-gates/#DRAPartitionableDevices)
 is enabled in the kube-apiserver and kube-scheduler.
 
 ## Consumable capacity
@@ -736,10 +739,13 @@ Allocating a device with admin access (described [above](#admin-access))
 is not exempt either. An admin using that mode must explicitly tolerate all taints
 to access tainted devices.
 
-Device taints and tolerations is an *alpha feature* and only enabled when the
-`DRADeviceTaints` [feature gate](/docs/reference/command-line-tools-reference/feature-gates/)
-is enabled in the kube-apiserver, kube-controller-manager and kube-scheduler.
-To use DeviceTaintRules, the `resource.k8s.io/v1alpha3` API version must be enabled.
+Device taints and tolerations is a *beta feature* and enabled when the
+[`DRADeviceTaints` feature gate](/docs/reference/command-line-tools-reference/feature-gates/#DRADeviceTaints)
+is kept enabled in the kube-apiserver, kube-controller-manager and kube-scheduler.
+To use DeviceTaintRules, the `resource.k8s.io/v1beta2` API version must be
+enabled together with the [`DRADeviceTaintRules` feature gate](/docs/reference/command-line-tools-reference/feature-gates/#DRADeviceTaintRules).
+In contrast to `DRADeviceTaints`, `DRADeviceTaintRules` is off by default because of this dependency
+on the beta API group, which has to be off by default.
 
 You can add taints to devices in the following ways, by using the DeviceTaintRule API kind.
 
@@ -779,7 +785,7 @@ It can be modified and and removed at any time.
 Here is one example of a DeviceTaintRule for a fictional DRA driver:
 
 ```yaml
-apiVersion: resource.k8s.io/v1alpha3
+apiVersion: resource.k8s.io/v1beta2
 kind: DeviceTaintRule
 metadata:
   name: example
@@ -795,8 +801,14 @@ spec:
     effect: NoExecute
 ```
 
-The apiserver automatically tracks when this taint was created and the eviction
-controller adds a condition with some information:
+The kube-apiserver automatically tracks when this taint was created by setting the
+`timeAdded` field in the `spec`. The toleration period starts at that time
+stamp. During updates which change the effect (see simulated eviction flow
+below), the kube-apiserver automatically updates the time stamp. Users can control
+the time stamp explicitly by setting the field when creating a DeviceTaintRule and
+by changing it to some different value when updating.
+
+The status contains a condition added by the eviction controller:
 
 ```
 kubectl describe devicetaintrules
@@ -877,7 +889,7 @@ To check resource pool status:
    optionally a limit on the number of pools returned. You can also limit it to a single pool by specifying a pool name:
 
    ```yaml
-   apiVersion: resource.k8s.io/v1alpha3
+   apiVersion: resource.k8s.io/v1beta2
    kind: ResourcePoolStatusRequest
    metadata:
      name: check-gpus
@@ -935,8 +947,7 @@ This feature requires explicit RBAC permissions on the ResourcePoolStatusRequest
 resource. No default ClusterRoles include this permission.
 
 Resource pool status is an *alpha feature* and only enabled when the
-`DRAResourcePoolStatus`
-[feature gate](/docs/reference/command-line-tools-reference/feature-gates/)
+[`DRAResourcePoolStatus` feature gate](/docs/reference/command-line-tools-reference/feature-gates/#DRAResourcePoolStatus)
 is enabled in the kube-apiserver and kube-controller-manager.
 
 ### Device Binding Conditions {#device-binding-conditions}
@@ -1041,6 +1052,10 @@ profiles:
       kind: DynamicResourcesArgs
       bindingTimeout: 60s
 ```
+
+Device binding conditions is an *alpha feature* and only enabled when the
+[`DRADeviceBindingConditions` feature gate](/docs/reference/command-line-tools-reference/feature-gates/#DRADeviceBindingConditions)
+is enabled in the kube-apiserver and kube-scheduler.
 
 ## {{% heading "whatsnext" %}}
 
