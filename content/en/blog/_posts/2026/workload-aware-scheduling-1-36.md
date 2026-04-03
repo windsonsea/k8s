@@ -8,6 +8,7 @@ author: >
   Maciej Skoczeń (Google),
   Antoni Zawodny (Google),
   Matt Matejczyk (Google),
+  Bartosz Rejman (Google),
   TBD
 ---
 
@@ -63,7 +64,7 @@ spec:
 Next, workload controllers (such as the Job controller) stamp out runtime PodGroup instances based on those templates.
 The PodGroup runtime object holds the actual scheduling policy and references the template from which it was created.
 It also has a status containing conditions that mirror the states of individual Pods,
-reflecting the overall scheduling state of the group.
+reflecting the overall scheduling state of the group:
 
 ```yaml
 apiVersion: scheduling.k8s.io/v1alpha2
@@ -158,7 +159,50 @@ this algorithm may fail to find a placement regardless of cluster state due to i
 
 ## Topology-aware scheduling
 
-TBD
+For complex distributed workloads like AI/ML training or batch processing, placing Pods randomly across a cluster
+can introduce significant network latency and bottleneck overall performance.
+
+Topology-aware scheduling addresses this problem by allowing you to define topology constraints directly on a PodGroup,
+ensuring its Pods are co-located within specific physical or logical domains:
+
+```yaml
+apiVersion: scheduling.k8s.io/v1alpha2
+kind: PodGroup
+metadata:
+  name: topology-aware-workers-pg
+spec:
+  schedulingPolicy:
+    gang:
+      minCount: 4
+  # Enforce that the pods are co-located based on the rack topology
+  schedulingConstraints:
+    topology:
+      - key: topology.kubernetes.io/rack
+```
+
+In this example, the `kube-scheduler` attempts to schedule the Pods across various combinations of nodes
+that match the `rack` topology constraint. It then selects the optimal placement based on how efficiently
+the PodGroup utilizes resources and how many Pods can successfully be scheduled within that domain.
+
+To achieve this, the scheduler extends the PodGroup scheduling cycle with a dedicated placement-based algorithm
+consisting of three phases:
+
+1. Generate candidate placements (subsets of Nodes that are theoretically feasible for the PodGroup's assignment)
+   based on the group's scheduling constraints. The topology-aware scheduling plugin uses the new `PlacementGenerate`
+   extension point to create these placements.
+
+2. Evaluate each proposed placement to confirm whether the entire PodGroup can actually fit there.
+
+3. Score all feasible placements to select the absolute best fit for the PodGroup. The topology-aware scheduling plugins
+   use the new `PlacementScore` extension point to score these placements.
+
+Currently, topology-aware scheduling does not trigger Pod preemption to satisfy constraints.
+However, we plan to integrate workload-aware preemption with topology constraints in the upcoming release.
+
+While Kubernetes v1.36 delivers this foundational topology-aware scheduling, we also plan to significantly
+expand its capabilities soon. Future updates will introduce support for multiple topology levels,
+soft constraints (preferences), deeper integration with Dynamic Resource Allocation (DRA),
+and more robust behavior when paired with the `basic` scheduling policy.
 
 ## Workload-aware preemption
 
@@ -181,14 +225,14 @@ For v1.37, the community is actively working on:
   solidifying their foundational role in the Kubernetes ecosystem. As part of this graduation process, we also plan to introduce `minCount` mutability
   to unlock elastic jobs and allow dynamic workloads to scale efficiently.
 
-* **Multi-level Workload Hierarchies:** To support complex modern AI workloads like JobSet or Disaggregated Inference via LeaderWorkerSet (LWS),
+* **Multi-level Workload hierarchies:** To support complex modern AI workloads like JobSet or Disaggregated Inference via LeaderWorkerSet (LWS),
   we are working on expanding the architecture to support multi-level hierarchies. We aim to introduce a new API
   that allows grouping multiple PodGroups into hierarchical structures, directly reflecting the organization of real-world workload controllers.
 
-* **Graduating Advanced Scheduling Features:** We are focused on driving the maturity of the broader workload-aware scheduling ecosystem.
+* **Graduating advanced scheduling features:** We are focused on driving the maturity of the broader workload-aware scheduling ecosystem.
   This includes bringing existing features, such as topology-aware scheduling and workload-aware preemption, to the Beta stage.
 
-* **Unified Controller Integration API:** To streamline adoption, we’re working on a controller integration API.
+* **Unified controller integration API:** To streamline adoption, we’re working on a controller integration API.
   This will provide real-world workload controllers with a unified, standardized method for consuming workload-aware scheduling capabilities.
 
 The priority and implementation order of these focus areas are subject to change. Stay tuned for further updates.
