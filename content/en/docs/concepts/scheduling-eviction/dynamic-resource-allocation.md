@@ -489,15 +489,12 @@ spec:
           adminAccess: true
 ```
 
-If this feature is disabled, the `adminAccess` field will be removed
-automatically when creating such a ResourceClaim.
-
 Admin access is a privileged mode and should not be granted to regular users in
-multi-tenant clusters. Starting with Kubernetes v1.33, only users authorized to
+multi-tenant clusters. Only users authorized to
 create ResourceClaim or ResourceClaimTemplate objects in namespaces labeled with
-`resource.k8s.io/admin-access: "true"` (case-sensitive) can use the `adminAccess` field.
-This ensures that non-admin users cannot misuse the feature.
-Starting with Kubernetes v1.34, this label has been updated to `resource.kubernetes.io/admin-access: "true"`.
+`resource.kubernetes.io/admin-access: "true"` (case-sensitive) can use the
+`adminAccess` field. This ensures that non-admin users cannot misuse the
+feature.
 
 Admin access is a *beta feature* and is enabled by default with the
 [`DRAAdminAccess` feature gate](/docs/reference/command-line-tools-reference/feature-gates/#DRAAdminAccess)
