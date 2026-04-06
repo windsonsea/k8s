@@ -1403,6 +1403,32 @@ read-only inside the container through CDI or an equivalent mechanism.
 
 {{< feature-state feature_gate_name="DRAListTypeAttributes" >}}
 
+This feature improves the ResourceSlice API, allowing DRA drivers to specify list values for device attributes instead of only scalars.
+This is useful for modeling more complex internal node topologies, for example when a CPU has adjacency to multiple PCIe roots.
+
+For ResourceClaim authors (end users), this means that the `matchAttribute` and `distinctAttribute` work better for these cases. 
+
+- `matchAttribute` — the two attributes must have a *non-empty list intersection*, rather than be identical (scalar values are treated as single-item lists). 
+  This just means that if one driver publishes a single value for, say, the PCIe root, and another driver publishes a list, the constraint is met as long as 
+  the single value appears somewhere in the list.
+- `distinctAttribute` — the attribute values must be *pairwise-disjoint* (no value shared between any two devices)
+
+To help ResourceClaim authors use attributes that may be lists inside CEL expressions, this feature also introduces an `includes()` CEL function.
+
+```
+# Scalar attribute (backward compatible)
+# assume: device.attributes["dra.example.com"].model = "model-a"
+device.attributes["dra.example.com"].model.includes("model-a")  # true
+device.attributes["dra.example.com"].model.includes("model-b")  # false
+
+# List-type attribute (requires DRAListTypeAttributes)
+# assume: device.attributes["dra.example.com"].supported-models= ["model-a", "model-b"]
+device.attributes["dra.example.com"].supported-models.includes("model-a")  # true
+device.attributes["dra.example.com"].supported-models.includes("model-c")  # false
+```
+
+#### Details for DRA Driver Authors
+
 By default, each `DeviceAttribute` holds exactly one scalar value: a boolean, an integer,
 a string, or a semantic version string. The `DRAListTypeAttributes` feature gate extends
 `DeviceAttribute` with four list-type fields, allowing a device to advertise multiple
@@ -1440,39 +1466,6 @@ spec:
         strings:
         - model-a
         - model-b
-```
-
-#### Effect on `matchAttribute` and `distinctAttribute`
-
-When `DRAListTypeAttributes` is enabled, the semantics of `matchAttribute` and
-`distinctAttribute` in `DeviceConstraint` change to use set semantics:
-
-- **`matchAttribute`** — the sets of values for that attribute across all selected devices
-  must have a **non-empty intersection**. Previously, all devices had to share the exact
-  same single value.
-- **`distinctAttribute`** — the sets of values for that attribute across all selected
-  devices must be **pairwise disjoint** (no value shared between any two devices).
-  Previously, all devices simply had to have different single values.
-
-Scalar attributes are backward-compatible: a single-value attribute is treated as a
-singleton set for the purpose of these comparisons.
-
-#### The `includes()` CEL function
-
-With the `DRAListTypeAttributes` feature gate enabled, the `includes()` CEL function
-is available. It works on both scalar attributes and list-type attributes, allowing smooth
-migration from scalar to list-type attributes without changing CEL selector expressions:
-
-```
-# Scalar attribute (backward compatible)
-# assume: device.attributes["dra.example.com"].model = "model-a"
-device.attributes["dra.example.com"].model.includes("model-a")  # true
-device.attributes["dra.example.com"].model.includes("model-b")  # false
-
-# List-type attribute (requires DRAListTypeAttributes)
-# assume: device.attributes["dra.example.com"].supported-models= ["model-a", "model-b"]
-device.attributes["dra.example.com"].supported-models.includes("model-a")  # true
-device.attributes["dra.example.com"].supported-models.includes("model-c")  # false
 ```
 
 List type attributes is an *alpha feature* and only enabled when the
