@@ -46,8 +46,8 @@ For example, liveness probes could catch a deadlock, where an application is
 running, but unable to make progress. Restarting a container in such a state
 can help to make the application more available despite bugs.
 
-If a container fails its liveness probe repeatedly, the kubelet restarts the
-container.
+If a container fails its liveness probe more times than the configured tolerance,
+the kubelet restarts that container.
 Liveness probes do not wait for readiness probes to succeed. If you want to
 wait before executing a liveness probe, you can either define
 `initialDelaySeconds` or use a [startup probe](#startup-probe).
@@ -244,40 +244,23 @@ spec:
       periodSeconds: 5
 ```
 
-* `initialDelaySeconds`: Number of seconds after the container has started
-  before startup, liveness or readiness probes are initiated. If a startup probe
-  is defined, liveness and readiness probe delays do not begin until the startup
-  probe has succeeded. In some older Kubernetes versions, the initialDelaySeconds
-  might be ignored if periodSeconds was set to a value higher than initialDelaySeconds.
-  However, in current versions, initialDelaySeconds is always honored and the probe
-  will not start until after this initial delay. Defaults to 0 seconds. Minimum value is 0.
-* `periodSeconds`: How often (in seconds) to perform the probe. Default to 10
-  seconds. The minimum value is 1. While a container is not Ready, the
-  readiness probe may be executed at times other than the configured
-  `periodSeconds` interval. This is to make the Pod ready faster.
-* `timeoutSeconds`: Number of seconds after which the probe times out. Defaults
-  to 1 second. Minimum value is 1.
-* `successThreshold`: Minimum consecutive successes for the probe to be
-  considered successful after having failed. Defaults to 1. Must be 1 for
-  liveness and startup Probes. Minimum value is 1.
-* `failureThreshold`: After a probe fails `failureThreshold` times in a row, Kubernetes
-  considers that the overall check has failed: the container is _not_ ready/healthy/live.
-  Defaults to 3. Minimum value is 1.
-  For the case of a startup or liveness probe, if at least `failureThreshold` probes have
-  failed, Kubernetes treats the container as unhealthy and triggers a restart for that
-  specific container. The kubelet honors the setting of `terminationGracePeriodSeconds`
-  for that container.
-  For a failed readiness probe, the kubelet continues running the container that failed
-  checks, and also continues to run more probes; because the check failed, the kubelet
-  sets the `Ready` [condition](/docs/concepts/workloads/pods/pod-lifecycle/#pod-conditions)
-  on the Pod to `false`.
-* `terminationGracePeriodSeconds`: configure a grace period for the kubelet to
-  wait between triggering a shut down of the failed container, and then forcing
-  the container runtime to stop that container. The default is to inherit the
-  Pod-level value for `terminationGracePeriodSeconds` (30 seconds if not
-  specified), and the minimum value is 1. See
-  [probe-level `terminationGracePeriodSeconds`](#probe-level-terminationgraceperiodseconds)
-  for more detail.
+`initialDelaySeconds`
+: Number of seconds after the container has started before startup, liveness or readiness probes are initiated. If a startup probe is defined, liveness and readiness probe delays do not begin until the startup probe has succeeded. In some older Kubernetes versions, the initialDelaySeconds might be ignored if periodSeconds was set to a value higher than initialDelaySeconds. However, in current versions, initialDelaySeconds is always honored and the probe will not start until after this initial delay. Defaults to 0 seconds. Minimum value is 0.
+
+`periodSeconds`
+: How often (in seconds) to perform the probe. Default to 10 seconds. The minimum value is 1. While a container is not Ready, the readiness probe may be executed at times other than the configured `periodSeconds` interval. This is to make the Pod ready faster.
+
+`timeoutSeconds`
+: Number of seconds after which the probe times out. Defaults to 1 second. Minimum value is 1.
+
+`successThreshold`
+: Minimum consecutive successes for the probe to be considered successful after having failed. Defaults to 1. Must be 1 for liveness and startup Probes. Minimum value is 1.
+
+`failureThreshold`
+: After a probe fails `failureThreshold` times in a row, Kubernetes considers that the overall check has failed: the container is _not_ ready/healthy/live. Defaults to 3. Minimum value is 1. For the case of a startup or liveness probe, if at least `failureThreshold` probes have failed, Kubernetes treats the container as unhealthy and triggers a restart for that specific container. The kubelet honors the setting of `terminationGracePeriodSeconds` for that container. For a failed readiness probe, the kubelet continues running the container that failed checks, and also continues to run more probes; because the check failed, the kubelet sets the `Ready` [condition](/docs/concepts/workloads/pods/pod-lifecycle/#pod-conditions) on the Pod to `false`.
+
+`terminationGracePeriodSeconds`
+: configure a grace period for the kubelet to wait between triggering a shut down of the failed container, and then forcing the container runtime to stop that container. The default is to inherit the Pod-level value for `terminationGracePeriodSeconds` (30 seconds if not specified), and the minimum value is 1. See [probe-level `terminationGracePeriodSeconds`](#probe-level-terminationgraceperiodseconds) for more detail.
 
 {{< caution >}}
 Incorrect implementation of readiness probes may result in an ever growing
@@ -294,7 +277,7 @@ as part of the probe specification. When both a pod- and probe-level
 `terminationGracePeriodSeconds` are set, the kubelet will use the probe-level
 value.
 
-When setting the `terminationGracePeriodSeconds`, please note the following:
+When setting the `terminationGracePeriodSeconds`, note the following:
 
 * The kubelet always honors the probe-level `terminationGracePeriodSeconds`
   field if it is present on a Pod.
@@ -321,11 +304,11 @@ spec:
         port: liveness-port
       failureThreshold: 1
       periodSeconds: 60
-      # Override pod-level terminationGracePeriodSeconds #
+      # Override pod-level terminationGracePeriodSeconds
       terminationGracePeriodSeconds: 60
 ```
 
-Probe-level `terminationGracePeriodSeconds` cannot be set for readiness probes.
+Probe-level `terminationGracePeriodSeconds` **cannot** be set for readiness probes.
 It will be rejected by the API server.
 
 ## Probe mechanism details {#probe-mechanism-details}
@@ -396,7 +379,8 @@ startupProbe:
         value: ""
 ```
 
-{{< note >}}
+#### Redirect handling {#http-probes-redirects}
+
 When the kubelet probes a container using HTTP, it follows redirects only if
 the redirect is to the same host. This includes redirects that change the
 protocol from HTTP to HTTPS, even if the probe is configured with
@@ -420,10 +404,9 @@ Events:
   Normal   Started       24m                     kubelet            Started container httpbin
  Warning  ProbeWarning  4m11s (x1197 over 24m)  kubelet            Readiness probe warning: Probe terminated redirects
 ```
-{{< /note >}}
 
 {{< caution >}}
-When processing an **httpGet** probe, the kubelet stops reading the response body after 10KiB.
+When processing an `httpGet` probe, the kubelet stops reading the response body after 10KiB.
 The probe's success is determined solely by the response status code, which is found in the response headers.
 
 If you probe an endpoint that returns a response body larger than **10KiB**,
