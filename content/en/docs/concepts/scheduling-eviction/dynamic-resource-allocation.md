@@ -1441,7 +1441,8 @@ values for a single attribute:
   (each at most 64 characters)
 
 The total number of individual attribute values per device (scalar fields plus all list
-elements combined) is limited to **48**. At most **64** devices per `ResourceSlice` may
+elements combined) is limited to **48**. When any device in a ResourceSlice uses this feature or other advanced features such as taints,
+the ResourceSlice will be limited to at most **64** devices.
 use list-type attributes or other advanced features such as taints.
 
 Here is an example of a device advertising multiple supported models using a list-type
