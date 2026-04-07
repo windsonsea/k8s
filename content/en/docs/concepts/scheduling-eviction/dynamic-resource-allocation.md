@@ -1055,6 +1055,128 @@ Device binding conditions is an *alpha feature* and only enabled when the
 [`DRADeviceBindingConditions` feature gate](/docs/reference/command-line-tools-reference/feature-gates/#DRADeviceBindingConditions)
 is enabled in the kube-apiserver and kube-scheduler.
 
+### Node allocatable resources {#node-allocatable-resources}
+
+{{< feature-state feature_gate_name="DRANodeAllocatableResources" >}}
+
+Devices managed by DRA can have an underlying footprint composed of node-allocatable
+resources, such as `cpu`, `memory`, `hugepages`, or `ephemeral-storage`.
+This feature integrates these DRA-based requests into the scheduler's standard
+accounting alongside regular Pod `spec` requests for these resources.
+
+Users (PodSpec authors) can use a mixture of Pod-level resources, container-level resources, 
+and resource claims with associated node-allocatable resources. These devices represent 
+resources like CPUs or memory directly, or they could be accelerators, network interface cards,
+or other devices that require some host resources when allocated. The DRA driver will 
+populate information in the ResourceSlice that tells the scheduler how to calculate the
+node allocatable resources when the device is allocated to a ResourceClaim.
+PodSpec authors do not need to make that calculation themselves.
+
+When authoring a PodSpec using claims for these types of devices, there are a few things to be aware of:
+
+*   When Pod-level resources are used, the sum of all container and claim resources 
+    must not exceed the Pod-level resources; otherwise, the Pod will fail to schedule.
+*   A container's total resource requirement is the sum of its container-level resources
+    and any node-allocatable resources from its associated resource claims.
+*   Claims that consume node allocatable resources cannot be shared between Pods.
+
+#### Details for DRA Driver Authors
+
+DRA drivers declare this node allocatable resource footprint using the
+`nodeAllocatableResourceMappings` field on devices within a ResourceSlice.
+This mapping translates the requested DRA device or capacity into standard
+resources that are tracked in the node's `status.allocatable` (note that extended
+resources are not supported for this mapping). This is useful both for drivers that directly
+expose native resources (like a CPU or Memory DRA driver) and for devices that
+require auxiliary node dependencies (like an accelerator that needs host memory).
+
+This mapping defines the translation of the requested DRA device or capacity
+units to the corresponding quantity of the node-allocatable resource. The
+scheduler calculates the exact quantity using:
+
+*   **Device-based scaling:** If `capacityKey` is not set, the
+    `allocationMultiplier` multiplies the device count allocated to the claim.
+    The `allocationMultiplier` defaults to 1 if not specified.
+*   **Capacity-based scaling:** If `capacityKey` is set, it references a
+    capacity name defined in the device's `capacity` map. The scheduler looks
+    up the amount of that capacity consumed by the claim and multiplies it by
+    the `allocationMultiplier`.
+
+##### Example: CPU DRA Driver (Capacity-based scaling)
+
+Here is an example where a CPU DRA driver exposes a CPU socket as a pool of 128
+CPUs using [DRA consumable capacity](#consumable-capacity). The `capacityKey` links the consumed
+`cpu.example.com/cpu` capacity directly to the node's standard `cpu`
+allocatable resource:
+
+```yaml
+apiVersion: resource.k8s.io/v1
+kind: ResourceSlice
+metadata:
+  name: my-node-cpus
+spec:
+  driver: cpu.example.com
+  nodeName: my-node
+  pool:
+    name: socket-cpus
+    generation: 1
+    resourceSliceCount: 1
+  devices:
+  - name: socket0cpus
+    allowMultipleAllocations: true
+    capacity:
+      "cpu.example.com/cpu": "128"
+    nodeAllocatableResourceMappings:
+      cpu:
+        capacityKey: "cpu.example.com/cpu"
+        # allocationMultiplier defaults to 1 if omitted
+  - name: socket1cpus
+    allowMultipleAllocations: true
+    capacity:
+      "cpu.example.com/cpu": "128"
+    nodeAllocatableResourceMappings:
+      cpu:
+        capacityKey: "cpu.example.com/cpu"
+        # allocationMultiplier defaults to 1 if omitted
+```
+
+##### Example: Accelerator with Auxiliary Resources (Device-based scaling)
+
+Here is an example of a resource slice where an accelerator requires an
+additional 8Gi of memory per device instance to function:
+
+```yaml
+apiVersion: resource.k8s.io/v1
+kind: ResourceSlice
+metadata:
+  name: my-node-xpus
+spec:
+  driver: xpu.example.com
+  nodeName: my-node
+  pool:
+    name: xpu-pool
+    generation: 1
+    resourceSliceCount: 1
+  devices:
+  - name: xpu-model-x-001
+    attributes:
+      example.com/model:
+        string: "model-x"
+    nodeAllocatableResourceMappings:
+      memory:
+        allocationMultiplier: "8Gi"
+```
+
+After a Pod is successfully bound to the node, the exact quantities of 
+node-allocatable resources allocated via DRA are included in the Pod's
+`status.nodeAllocatableResourceClaimStatuses` field.
+
+Node-allocatable resources is an alpha feature and is enabled when the
+[`DRANodeAllocatableResources` feature gate](/docs/reference/command-line-tools-reference/feature-gates/#DRANodeAllocatableResources) is enabled in the kube-apiserver,
+kube-scheduler, and kubelet. In the alpha phase, the kubelet does not account
+for these resources when determining QoS classes, configuring cgroups, or making
+eviction decisions.
+
 ## {{% heading "whatsnext" %}}
 
 - [Set Up DRA in a Cluster](/docs/tasks/configure-pod-container/assign-resources/set-up-dra-cluster/)
