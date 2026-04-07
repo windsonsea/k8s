@@ -39,6 +39,66 @@ Pressure Stall Information (PSI) metrics are provided for three resources: CPU, 
 
 Each pressure type provides four metrics: `avg10`, `avg60`, `avg300`, and `total`. The `avg` values represent the percentage of wall-clock time that tasks were stalled over 10-second, 60-second, and 5-minute moving averages. The `total` value is a cumulative counter in microseconds showing the total time tasks have been stalled.
 
+Let's take for example the following query from the Summary API:  
+`kubectl get --raw "/api/v1/nodes/$(kubectl get nodes -o jsonpath='{.items[0].metadata.name}')/proxy/stats/summary" | jq '.pods[].containers[] | select(.name=="<CONTAINER_NAME>") | {name, cpu: .cpu.psi, memory: .memory.psi, io: .io.psi}'`. 
+This returns the information in a json format as such. 
+
+```
+{
+  "name": "<CONTAINER_NAME>",
+  "cpu": {
+    "full": {
+      "total": 0,
+      "avg10": 0,
+      "avg60": 0,
+      "avg300": 0
+    },
+    "some": {
+      "total": 35232438,
+      "avg10": 0.74,
+      "avg60": 0.52,
+      "avg300": 0.21,
+    },  
+  },
+  "memory": {
+    "full": {
+      "total": 539105,
+      "avg10": 0,
+      "avg60": 0,
+      "avg300": 0
+    },
+    "some": {
+      "total": 658164,
+      "avg10": 0.01,
+      "avg60": 0.01,
+      "avg300": 0.00,
+    },
+    }
+  },
+  "io": {
+    "full": {
+      "total": 33190987,
+      "avg10": 0.31,
+      "avg60": 0.22,
+      "avg300": 0.05,
+    },
+    "some": {
+      "total": 40809937,
+      "avg10": 0.52,
+      "avg60": 0.45,
+      "avg300": 0.12,
+    }
+  }
+}
+```
+
+Here is a simple spike scenario. The cpu.some `avg10` value of `0.74` indicates that in the last 10 seconds, at least one task in this container was stalled on the CPU for 0.74% of the time (0.0074 seconds or 74 milliseconds). Because `avg10` (0.74) is significantly higher than `avg300` (0.21) on the same resource, this suggests a recent surge in resource contention rather than a sustained long-term bottleneck. If monitored continuously and the `avg300` metrics increase as well, we can diagnose a more serious, lasting issue!
+
+Additionally, notice how in this example `cpu.some` shows pressure, while `cpu.full` remains at 0.00. This tells us that while some processes were delayed waiting for CPU time, the container as a whole was still making progress. A non-zero full value would indicate that all non-idle tasks were stalled simultaneously, a much bigger problem.
+Although not as human-readable, the `total` value of 35232438 represents the cumulative stall time in microseconds, that allow latency spike detection that otherwise may not show in the averages. 
+
+As a final note, when observing high I/O Pressure alongside low Memory Pressure, it can indicate that the application is waiting on disk throughput rather than failing due to a lack of available RAM. The node is not over-committed on memory, and a different diagnosis for disk consumption can be investigated. 
+
 ## Example Scenarios
 
 You can use a simple Pod with a stress-testing tool to generate resource pressure and observe the PSI metrics. The following examples use the `agnhost` container image, which includes the `stress` tool.
