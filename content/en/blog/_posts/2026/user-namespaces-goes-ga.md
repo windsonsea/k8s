@@ -53,8 +53,8 @@ ownership on disk, the kernel remaps it at mount time.
 When a volume is mounted into a Pod with User Namespaces enabled, the
 kernel performs a transparent translation of the UIDs (user ids) and
 GIDs (group ids). To the container, the files appear owned by
-UID 0. To the host and the actual disk, they remain owned by the
-original UID. This is an `O(1)` operation, instant and efficient.
+UID 0. On disk, file ownership is unchanged — no `chown` is needed.
+This is an `O(1)` operation, instant and efficient.
 
 ## Using it in Kubernetes v1.36
 
