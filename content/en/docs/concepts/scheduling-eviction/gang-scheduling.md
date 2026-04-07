@@ -34,13 +34,14 @@ The process follows these steps independently for each pod group and its replica
    Pods do not enter the active scheduling queue until all of these conditions are met.
 
 2. Once the quorum is met, the scheduler attempts to find placements for all Pods in the group.
-   All assigned Pods wait at the `WaitOnPermit` gate during this process.
-   Note that in the Alpha phase of this feature, finding a placement is based on pod-by-pod scheduling,
-   rather than a single-cycle approach.
+   It utilizes the [PodGroup scheduling](/docs/concepts/scheduling-eviction/podgroup-scheduling/) cycle to make a single,
+   atomic scheduling decision. `GangScheduling` plugin implements a `Permit` extension point that is evaluated for each
+   schedulable Pod during the cycle. This is used to determine whether the `minCount` constraint is satisfied,
+   by comparing the number of successfully placed pods against the `minCount` value.
 
-3. If the scheduler finds valid placements for at least `minCount` Pods,
-   it allows all of them to be bound to their assigned nodes. If it cannot find placements for the entire group
-   within a fixed timeout of 5 minutes, none of the Pods are scheduled.
+3. If the scheduler finds valid placements for at least the `minCount` number of Pods,
+   it allows those successfully placed Pods to be bound to their assigned nodes.
+   If it cannot find enough placements to satisfy the `minCount` requirement, none of the Pods are scheduled.
    Instead, they are moved to the unschedulable queue to wait for cluster resources to free up,
    allowing other workloads to be scheduled in the meantime.
 
@@ -48,3 +49,4 @@ The process follows these steps independently for each pod group and its replica
 
 * Learn about the [Workload API](/docs/concepts/workloads/workload-api/).
 * See how to [reference a Workload](/docs/concepts/workloads/pods/workload-reference/) in a Pod.
+* Read about [PodGroup scheduling](/docs/concepts/scheduling-eviction/podgroup-scheduling/).

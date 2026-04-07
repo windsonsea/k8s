@@ -19,11 +19,13 @@ You must specify exactly one policy for each group.
 
 ### Basic policy
 
-The `basic` policy instructs the scheduler to treat all Pods in the group as independent entities,
-scheduling them using the standard Kubernetes behavior.
+The `basic` policy instructs the scheduler to evaluate all Pods on a best-effort basis.
+Unlike the `gang` policy, a PodGroup using the `basic` policy is considered feasible
+regardless of how many of its Pods are currently schedulable.
 
-The main reason to use the `basic` policy is to organize the Pods within your Workload
-for better observability and management.
+The primary reason to use the `basic` policy is to organize the Pods within your Workload
+for better observability and management, while still evaluating them together within a single,
+atomic [PodGroup scheduling cycle](/docs/concepts/scheduling-eviction/podgroup-scheduling/#podgroup-scheduling-cycle).
 
 This policy can be used for groups of a Workload that do not require simultaneous startup
 but logically belong to the application, or to open the way for future group constraints
@@ -54,4 +56,5 @@ policy:
 
 ## {{% heading "whatsnext" %}}
 
+* Read about [PodGroup scheduling](/docs/concepts/scheduling-eviction/podgroup-scheduling/).
 * Read about [gang scheduling](/docs/concepts/scheduling-eviction/gang-scheduling/) algorithm.
