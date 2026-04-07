@@ -61,7 +61,7 @@ original UID. This is an `O(1)` operation, instant and efficient.
 Using user namespaces is straightforward: all you need to do is set
 `hostUsers: false` in your Pod spec. No changes to your container
 images, no complex configuration. The interface remains the same one
-introduced during the Beta phase. In the `spec` for a Pod (or PodTemplate), you explicitly
+introduced during the Alpha phase. In the `spec` for a Pod (or PodTemplate), you explicitly
 opt-out of the host user namespace:
 
 ```yaml
@@ -83,7 +83,7 @@ CVEs rated HIGH mitigated, see the previous blog posts:
 [User Namespaces alpha](/blog/2022/10/03/userns-alpha/),
 [User Namespaces stateful pods in alpha](/blog/2023/09/13/userns-alpha/),
 [User Namespaces beta](/blog/2024/04/22/userns-beta/), and
-[User Namespaces enabled by default](/blog/2025/04/14/userns-enabled-by-default/).
+[User Namespaces enabled by default](/blog/2025/04/25/userns-enabled-by-default/).
 
 ## Getting involved
 
