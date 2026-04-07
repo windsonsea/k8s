@@ -28,7 +28,9 @@ SELinux logic when SELinux is unavailable or disabled in the Linux kernel. You c
 
 ## The problem
 
-Linux systems with Security Enhanced Linux(SELinux)enabled use labels attached to objects (for example, files and network sockets) to make access control decisions. Traditionally, the container runtime applies SELinux labels to a Pod and all its volumes. Kubernetes only passes the SELinux label from a Pod's `securityContext` fields
+Linux systems with Security Enhanced Linux (SELinux) enabled use labels attached to objects
+(for example, files and network sockets) to make access control decisions.
+Historically, the container runtime applies SELinux labels to a Pod and all its volumes. Kubernetes only passes the SELinux label from a Pod's `securityContext` fields
 to the container runtime.
 
 The container runtime then recursively changes the SELinux label on all files that
