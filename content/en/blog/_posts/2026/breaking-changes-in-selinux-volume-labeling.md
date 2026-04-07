@@ -18,19 +18,15 @@ Kubernetes v1.36 is the right release to audit your cluster and fix or opt out o
 If your nodes do not use SELinux, nothing changes for you: kubelet skips the whole
 SELinux logic when SELinux is unavailable or disabled in the Linux kernel. You can skip this article completely.
 
-<!--
-  This is a direct copy from content/en/blog/_posts/2023/efficient-selinux-relabeling-beta.md.
-  The problem is still the same. The old blog described SELinuxMountReadWriteOncePod feature gate,
-  now we're expanding it to all volumes.
-
-  Should we link it instead of copying? Rephrase it?
--->
+This blog builds on the earlier work described in the
+[Kubernetes 1.27: Efficient SELinux Relabeling (Beta)](https://kubernetes.io/blog/2023/04/18/kubernetes-1-27-efficient-selinux-relabeling-beta/)
+post, where the `SELinuxMountReadWriteOncePod` feature gate was described. The problem to be addressed remains
+the same. However, this blog extends that same approach to all volumes.
 
 ## The problem
-
-Linux systems with Security Enhanced Linux (SELinux) enabled use labels attached to objects
-(for example, files and network sockets) to make access control decisions.
-Historically, the container runtime applies SELinux labels to a Pod and all its volumes. Kubernetes only passes the SELinux label from a Pod's `securityContext` fields
+Linux systems with Security Enhanced Linux (SELinux) enabled use labels attached to objects
+(for example, files and network sockets) to make access control decisions.
+Historically, the container runtime applies SELinux labels to a Pod and all its volumes. Kubernetes only passes the SELinux label from a Pod's `securityContext` fields
 to the container runtime.
 
 The container runtime then recursively changes the SELinux label on all files that
@@ -156,7 +152,9 @@ you also must not have explicitly overridden the `SELinuxChangePolicy` feature g
 The controller watches all Pods in the cluster and emits an Event when it finds two Pods that share the same
 volume in a way that is not compatible with the `SELinuxMount` feature gate.
 All such conflicting Pods will receive an event like
-*"SELinuxLabel "system_u:system_r:container_t:s0:c98,c99" conflicts with pod my-other-pod that uses the same volume as this pod with SELinuxLabel "system_u:system_r:container_t:s0:c0,c1". If both pods land on the same node, only one of them may access the volume."*
+```console
+SELinuxLabel "system_u:system_r:container_t:s0:c98,c99" conflicts with pod my-other-pod that uses the same volume as this pod with SELinuxLabel "system_u:system_r:container_t:s0:c0,c1". If both pods land on the same node, only one of them may access the volume.
+```
 The actual Pod name may be censored when the conflicting Pods run in different namespaces to prevent leaking information across namespace boundaries.
 
 The controller reports such an event even when these Pods don't run on the same node, to make sure all Pods work
@@ -185,8 +183,10 @@ To ensure a smooth upgrade path from v1.36 to a release with `SELinuxMount` enab
    The full Pod name is available only in the `selinux_warning_controller_selinux_volume_conflict` metric.
 1. Once both metrics have been accounted for, upgrade to a Kubernetes version that has `SELinuxMount` enabled.
 
-Consider using a [MutatingAdmissionPolicy](/docs/reference/access-authn-authz/mutating-admission-policy/) to set the opt-out
-in all Pods in a whole namespace or even in the whole cluster.
+Consider using a [MutatingAdmissionPolicy](/docs/reference/access-authn-authz/mutating-admission-policy/),
+a [mutating webhook](/docs/reference/access-authn-authz/extensible-admission-controllers/#what-are-admission-webhooks_),
+or a policy engine like [Kyverno](https://github.com/kyverno/kyverno/) or [Gatekeeper](https://github.com/open-policy-agent/gatekeeper)
+to apply the opt-out to all Pods in a namespace or across the entire cluster.
 
 When `SELinuxMount` is enabled, kubelet will emit the metric `volume_manager_selinux_volume_context_mismatch_errors_total` with the number of
 Pods that could not start because their SELinux label conflicts with an existing Pod that uses the same volume.
