@@ -10,6 +10,7 @@ author: >
   Matt Matejczyk (Google),
   Bartosz Rejman (Google),
   Jon Huhn (Microsoft),
+  Maciej Wyrzuc (Google),
   TBD
 ---
 
@@ -181,7 +182,7 @@ spec:
       - key: topology.kubernetes.io/rack
 ```
 
-In this example, the `kube-scheduler` attempts to schedule the Pods across various combinations of nodes
+In this example, the `kube-scheduler` attempts to schedule the Pods across various combinations of Nodes
 that match the `rack` topology constraint. It then selects the optimal placement based on how efficiently
 the PodGroup utilizes resources and how many Pods can successfully be scheduled within that domain.
 
@@ -207,7 +208,40 @@ and more robust behavior when paired with the `basic` scheduling policy.
 
 ## Workload-aware preemption
 
-TBD
+To support the new PodGroup scheduling cycle, we have introduced a new type of preemption mechanism
+called *workload-aware preemption*. When a PodGroup cannot be scheduled, the scheduler utilizes this mechanism
+to try making a scheduling of this PodGroup possible.
+
+Compared to the default preemption used in the standard Pod-by-Pod scheduling cycle, this new mechanism
+treats the entire PodGroup as a single preemptor unit. Instead of evaluating preemption victims on each Node separately,
+it searches across the entire cluster. This allows the scheduler to preempt Pods from multiple Nodes simultaneously,
+making enough space to schedule the whole PodGroup afterwards.
+
+Workload-aware preemption also introduces two additional concepts directly to the PodGroup API:
+
+* PodGroup `priority` that overrides the priority of the individual Pods forming the PodGroup.
+
+* PodGroup `disruptionMode` that dictates whether the Pods within a PodGroup can be preempted independently,
+  or if they have to be preempted together in an *all-or-nothing* fashion.
+
+In Kubernetes v1.36, these fields are only respected by the workload-aware preemption mechanism.
+We plan to extend support for these fields to other disruption sources, including default preemption
+used in the Pod-by-Pod scheduling cycle, in future releases.
+
+```yaml
+apiVersion: scheduling.k8s.io/v1alpha2
+kind: PodGroup
+metadata:
+  name: victim-pg
+spec:
+  priorityClassName: high-priority
+  priority: 1000
+  disruptionMode: PodGroup
+```
+
+In this example, when the scheduler evaluates `victim-pg` as a potential preemption victim
+during a workload-aware preemption cycle, it will use 1000 as its priority and preempt the PodGroup
+in a strictly *all-or-nothing* fashion.
 
 ## DRA ResourceClaim support for workloads
 
@@ -215,10 +249,10 @@ Since its general availability in Kubernetes v1.34, {{< glossary_tooltip text="D
 has enabled Pods to make detailed requests for {{<glossary_tooltip text="devices" term_id="device" >}}
 like GPUs, TPUs, and NICs. Requested devices can be shared by multiple Pods
 requesting the same {{< glossary_tooltip text="ResourceClaim" term_id="resourceclaim" >}}
-by name. Other requests can be replicated through a {{< glossary_tooltip text="ResourceClaimTemplate" term_id="resourceclaimtemplate" >}}
+by name. Other requests can be replicated through a {{< glossary_tooltip text="ResourceClaimTemplate" term_id="resourceclaimtemplate" >}},
 in which Kubernetes generates one ResourceClaim with a non-deterministic name
-for each Pod referencing the template. Large-scale workloads that require
-certain Pods to share certain devices currently are left to manage creating
+for each Pod referencing the template. However, large-scale workloads that require
+certain Pods to share certain devices are currently left to manage creating
 individual ResourceClaims themselves.
 
 Now, in addition to Pods, PodGroups can represent the replicable unit for a
@@ -271,8 +305,8 @@ spec:
       resourceClaimTemplateName: my-claim-template
 ```
 
-In addition, ResourceClaims referenced by PodGroups either through
-`resourceClaimName` or the claim generated from `resourceClaimTemplateName`
+In addition, ResourceClaims referenced by PodGroups, either through
+`resourceClaimName` or the claim generated from `resourceClaimTemplateName`,
 become reserved for the entire PodGroup. Previously, kube-scheduler could only
 list individual Pods in a ResourceClaim's `status.reservedFor` field which is
 limited to 256 items. Now, a single PodGroup reference in `status.reservedFor`
