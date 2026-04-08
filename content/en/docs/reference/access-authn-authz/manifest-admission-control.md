@@ -19,7 +19,7 @@ independently of {{< glossary_tooltip text="etcd" term_id="etcd" >}}, and can
 protect API-based admission resources from modification.
 
 To use the feature, enable the `ManifestBasedAdmissionControlConfig`
-[feature gate](/docs/reference/command-line-tools-reference/feature-gates/) and
+[feature gate](/docs/reference/command-line-tools-reference/feature-gates/#ManifestBasedAdmissionControlConfig) and
 configure the `staticManifestsDir` field in the
 [AdmissionConfiguration](/docs/reference/config-api/apiserver-config.v1/#apiserver-k8s-io-v1-AdmissionConfiguration)
 file passed to the kube-apiserver via `--admission-control-config-file`.
@@ -129,12 +129,12 @@ When the feature gate is disabled, a warning is returned instead.
 
 {{< note >}}
 If two manifest files define objects of the same type with the same name, the
-API server fails to start with a descriptive error.
+API server fails to start, displaying a descriptive error.
 {{< /note >}}
 
 ### Restrictions
 
-Manifest-based admission configurations exist in an isolated universe and cannot
+Manifest-based admission configurations exist in isolation and cannot
 reference API resources. The following restrictions apply:
 
 - **Webhooks**: Must use `clientConfig.url`. The `clientConfig.service` field is
@@ -229,6 +229,8 @@ The kube-apiserver watches the configured directories for changes:
      previous valid configuration is retained.
    - Successful reloads atomically replace the previous configuration.
 
+<!-- -->
+
 1. **Atomic file updates**: To avoid partial reads during file writes, make
    changes atomically (for example, write to a temporary file and rename it).
    This is especially important when updating mounted ConfigMaps or Secrets in
@@ -248,11 +250,11 @@ Manifest-based admission control provides the following metrics for monitoring
 reload health:
 
 {{< table caption="Metrics for manifest-based admission control" >}}
-| Metric | Type | Description |
-|:-------|:-----|:------------|
-| `apiserver_manifest_admission_config_controller_automatic_reloads_total` | Counter | Total number of reload attempts, with `status` (`success` or `failure`), `plugin`, and `apiserver_id_hash` labels. |
-| `apiserver_manifest_admission_config_controller_automatic_reload_last_timestamp_seconds` | Gauge | Timestamp of the last reload attempt, with `status`, `plugin`, and `apiserver_id_hash` labels. |
-| `apiserver_manifest_admission_config_controller_last_config_info` | Gauge | Current configuration info (value is always 1), with `plugin`, `apiserver_id_hash`, and `hash` labels. Use the `hash` label to detect configuration drift across API servers. |
+| Type | Description | Metric |
+|:-----|:------------|:-------|
+| Counter | Total number of reload attempts, with `status` (`success` or `failure`), `plugin`, and `apiserver_id_hash` labels. | `apiserver_manifest_admission_config_controller_automatic_reloads_total` |
+| Gauge | Timestamp of the last reload attempt, with `status`, `plugin`, and `apiserver_id_hash` labels. | `apiserver_manifest_admission_config_controller_automatic_reload_last_timestamp_seconds` |
+| Gauge | Current configuration information (value is always 1), with `plugin`, `apiserver_id_hash`, and `hash` labels. Use the `hash` label to detect configuration drift across API servers. | `apiserver_manifest_admission_config_controller_last_config_info` |
 {{< /table >}}
 
 The `plugin` label identifies which admission plugin the metric applies to:

@@ -487,7 +487,7 @@ Names ending in `.static.k8s.io` are reserved for
 [manifest-based admission control](/docs/reference/access-authn-authz/manifest-admission-control/)
 and cannot be used for API-based webhook configurations. This reservation is
 enforced when the `ManifestBasedAdmissionControlConfig`
-[feature gate](/docs/reference/command-line-tools-reference/feature-gates/) is enabled.
+[feature gate](/docs/reference/command-line-tools-reference/feature-gates/#ManifestBasedAdmissionControlConfig) is enabled.
 {{< /note >}}
 
 Each configuration can contain one or more webhooks.
