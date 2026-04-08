@@ -1025,6 +1025,11 @@ to learn more.
 
 ## External IPs
 
+{{< caution >}}
+The `externalIPs` feature is deprecated as of Kubernetes v1.36.
+Consider using an external load balancer controller or a Gateway API implementation instead.
+{{< /caution >}}
+
 If there are external IPs that route to one or more cluster nodes, Kubernetes Services
 can be exposed on those `externalIPs`. When network traffic arrives into the cluster, with
 the external IP (as destination IP) and the port matching that Service, rules and routes
