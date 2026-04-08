@@ -57,7 +57,7 @@ There is an alpha feature `MemoryQoS` which attempts to add more preemptive
 limit enforcement for memory (as opposed to reactive enforcement by the OOM
 killer). However, this effort is
 [stalled](https://github.com/kubernetes/enhancements/tree/a47155b340/keps/sig-node/2570-memory-qos#latest-update-stalled)
-due to a potential livelock situation a memory hungry can cause.
+due to a potential livelock situation a memory hungry container process can cause.
 {{< /note >}}
 
 {{< note >}}
