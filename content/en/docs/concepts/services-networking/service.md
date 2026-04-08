@@ -1026,7 +1026,8 @@ to learn more.
 ## External IPs
 
 {{< caution >}}
-The `externalIPs` feature is deprecated as of Kubernetes v1.36.
+The `externalIPs` feature is deprecated as of Kubernetes v1.36, and all users should begin
+migrating away from it.
 Consider using an external load balancer controller or a Gateway API implementation instead.
 {{< /caution >}}
 
