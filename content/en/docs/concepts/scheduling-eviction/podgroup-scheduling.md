@@ -79,6 +79,35 @@ It iterates over the Pods and performs the following for each:
    If it returns a `Success` status for any Pod, the PodGroup is deemed feasible.
    If the algorithm processes all Pods without achieving a `Success` status, the PodGroup is considered unschedulable.
 
+## Placement scheduling algorithm
+{{< feature-state feature_gate_name="TopologyAwareWorkloadScheduling" >}}
+
+Placement scheduling algorithm is an alternative PodGroup scheduling algorithm, which uses
+[scheduling plugins](/docs/reference/scheduling/config/#scheduling-plugins) to find the optimal
+placement for the considered PodGroup. Users can accomodate the algorithm to their specific needs
+by using and configuring plugins.
+
+The algorithm proceeds in three main phases for a given PodGroup:
+
+### Phase 1: Candidate placement generation
+
+Generates candidate *placements* (subsets of nodes, that are theoretically feasible for PodGroup
+assignment), for example based on the PodGroup's scheduling constraints (which can be defined
+in the PodGroup object).
+
+This phase executes as extension point: `PlacementGeneratePlugin`.
+
+### Phase 2: Pod-level filtering and feasibility check
+
+Validates each proposed placement, by running a default PodGroup scheduling algorithm, to see if
+the required number of Pods from the PodGroup can fit. If they can, the placement is marked as feasible.
+
+### Phase 3:  Placement scoring and selection
+
+Scores all feasible placements to select the optimal domain for the PodGroup.
+
+This phase executes as extension point: `PlacementScorePlugin`.
+
 ### Limitations
 
 The PodGroup scheduling algorithm relies on specific Pod sorting and may fail to find a valid placement
