@@ -184,3 +184,7 @@ explained in the logs.
 
 For mode detail about the behavior of the individual options you can configure, please refer to the
 [Node ResourceManagers](/docs/concepts/policy/node-resource-managers) documentation.
+
+## {{% heading "whatsnext" %}}
+
+* Read about [Pod-level resource managers](/docs/concepts/workloads/resource-managers/#pod-level-resource-managers).
