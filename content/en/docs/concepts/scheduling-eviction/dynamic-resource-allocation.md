@@ -964,7 +964,7 @@ Resource pool status is an *alpha feature* and only enabled when the
 [`DRAResourcePoolStatus` feature gate](/docs/reference/command-line-tools-reference/feature-gates/#DRAResourcePoolStatus)
 is enabled in the kube-apiserver and kube-controller-manager.
 
-### Device Binding Conditions {#device-binding-conditions}
+### Device binding conditions
 
 {{< feature-state feature_gate_name="DRADeviceBindingConditions" >}}
 
@@ -986,13 +986,16 @@ following fields in the `Device` section of a `ResourceSlice`. Cluster administr
 must enable the `DRADeviceBindingConditions` and `DRAResourceClaimDeviceStatus` feature
 gates for the scheduler to honor these fields.
 
-- `bindingConditions`: A list of condition types that must be set to True in the
-  status.conditions field of the associated ResourceClaim before the Pod can be bound.
-  These typically represent readiness signals such as "DeviceAttached" or "DeviceInitialized".
-- `bindingFailureConditions`: A list of condition types that, if set to True in
+`bindingConditions`
+: A list of _condition types_ that must be set to True (in the `.status.conditions` field of the associated ResourceClaim) before the Pod can be bound. These conditions typically represent readiness signals, such as DeviceAttached or DeviceInitialized.
+
+`bindingFailureConditions`
+: A list of condition types that, if set to True in
   status.conditions field of the associated ResourceClaim, indicate a failure state.
   If any of these conditions are True, the scheduler will abort binding and reschedule the Pod.
-- `bindsToNode`: if set to `true`, the scheduler records the selected node name in the
+
+`bindsToNode`
+: if set to `true`, the scheduler records the selected node name in the
   `status.allocation.nodeSelector` field of the ResourceClaim.
   This does not affect the Pod's `spec.nodeSelector`. Instead, it sets a node selector
   inside the ResourceClaim, which external controllers can use to perform node-specific
@@ -1006,13 +1009,32 @@ condition semantics (`type`, `status`, `reason`, `message`, `lastTransitionTime`
 The scheduler waits up to **600 seconds** (default) for all `bindingConditions` to become `True`.
 If the timeout is reached or any `bindingFailureConditions` are `True`, the scheduler
 clears the allocation and reschedules the Pod.
-This timeout duration is configurable by the user through `KubeSchedulerConfiguration`.
+A cluster administration can configure this timeout duration by editing the kube-scheduler configuration file.
+
+An example of configuring this timeout in `KubeSchedulerConfiguration` is given below:
+
+```yaml
+apiVersion: kubescheduler.config.k8s.io/v1
+kind: KubeSchedulerConfiguration
+profiles:
+- schedulerName: default-scheduler
+  pluginConfig:
+  - name: DynamicResources
+    args:
+      apiVersion: kubescheduler.config.k8s.io/v1
+      kind: DynamicResourcesArgs
+      bindingTimeout: 60s
+```
+
+#### Example {#device-binding-conditions-example}
+
+Here is an example of a ResourceSlice that you might see in a cluster where there's a DRA driver in use, and that driver supports binding conditions:
 
 ```yaml
 apiVersion: resource.k8s.io/v1
 kind: ResourceSlice
 metadata:
-  name: gpu-slice
+  name: gpu-slice-1
 spec:
   driver: dra.example.com
   nodeSelector:
@@ -1052,24 +1074,9 @@ must be prepared (the `is-prepared` condition has a status of `True`) before bin
 - External controllers can use the node selector in the ResourceClaim to perform
 node-specific setup on the selected node.
 
-An example of configuring this timeout in `KubeSchedulerConfiguration` is given below:
-
-```yaml
-apiVersion: kubescheduler.config.k8s.io/v1
-kind: KubeSchedulerConfiguration
-profiles:
-- schedulerName: default-scheduler
-  pluginConfig:
-  - name: DynamicResources
-    args:
-      apiVersion: kubescheduler.config.k8s.io/v1
-      kind: DynamicResourcesArgs
-      bindingTimeout: 60s
-```
-
-Device binding conditions is an *alpha feature* and only enabled when the
+Device binding conditions is a *beta feature* and is enabled by default, controlled by the
 [`DRADeviceBindingConditions` feature gate](/docs/reference/command-line-tools-reference/feature-gates/#DRADeviceBindingConditions)
-is enabled in the kube-apiserver and kube-scheduler.
+in the kube-apiserver and kube-scheduler.
 
 ### Node allocatable resources {#node-allocatable-resources}
 
