@@ -382,7 +382,11 @@ DRA drivers can report driver-specific
 [device status](/docs/concepts/overview/working-with-objects/#object-spec-and-status)
 data for each allocated device in the `status.devices` field of a ResourceClaim.
 For example, the driver might list the IP addresses that are assigned to a
-network interface device.
+network interface device. Updating this field requires specific synthetic RBAC permissions,
+see
+[Hardening Guide - Dynamic Resource Allocation](/docs/concepts/security/hardening-guide/dynamic-resource-allocation/)
+and
+[Harden Dynamic Resource Allocation in Your Cluster](/docs/tasks/administer-cluster/hardening-dra/).
 
 The accuracy of the information that a driver adds to a ResourceClaim
 `status.devices` field depends on the driver. Evaluate drivers to decide whether
@@ -500,6 +504,29 @@ feature.
 Admin access is a *beta feature* and is enabled by default with the
 [`DRAAdminAccess` feature gate](/docs/reference/command-line-tools-reference/feature-gates/#DRAAdminAccess)
 in the kube-apiserver, kube-scheduler, and kubelet.
+
+### Granular status authorization {#granular-status-authorization}
+
+{{< feature-state feature_gate_name="DRAResourceClaimGranularStatusAuthorization" >}}
+
+Starting in Kubernetes v1.36, DRA enforces fine-grained authorization checks for updates
+to `ResourceClaim` status by using synthetic subresources and node-aware verbs.
+
+For security hardening guidance, including RBAC examples for scheduler and DRA
+drivers, see
+[Hardening Guide - Dynamic Resource Allocation](/docs/concepts/security/hardening-guide/dynamic-resource-allocation/).
+
+For a step-by-step cluster administrator procedure, see
+[Harden Dynamic Resource Allocation in Your Cluster](/docs/tasks/administer-cluster/hardening-dra/).
+
+## DRA alpha features {#alpha-features}
+
+The following sections describe DRA features that are available in the Alpha
+[feature stage](/docs/reference/command-line-tools-reference/feature-gates/#feature-stages).
+They depend on enabling feature gates and may depend on additional
+{{< glossary_tooltip text="API groups" term_id="api-group" >}}.
+For more information, see
+[Set up DRA in the cluster](/docs/tasks/configure-pod-container/assign-resources/set-up-dra-cluster/).
 
 ### Extended resource allocation by DRA {#extended-resource}
 
