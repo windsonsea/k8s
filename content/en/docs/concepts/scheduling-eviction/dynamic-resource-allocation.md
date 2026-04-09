@@ -438,6 +438,22 @@ cluster can access the devices. There's one device in the ResourceSlice, named
 A DeviceClass could select this ResourceSlice by using these attributes, and a
 ResourceClaim could filter for specific devices in that DeviceClass.
 
+#### Naming and prioritization {#resourceslice-naming-and-prioritization}
+
+The order in which the Kubernetes scheduler evaluates devices for allocation is
+determined by the lexicographical sorting of ResourceSlice and resource pool names.
+The scheduler uses a first-fit strategy, meaning it selects the first available device
+that satisfies the claim's requirements.
+
+This allows the priority of resource allocation to be influenced by the names
+assigned to pools and ResourceSlices. Note that pools without
+[binding conditions](#device-binding-conditions) are always evaluated before those
+with binding conditions, regardless of their names.
+
+For drivers built using the `k8s.io/dynamic-resources/kubeletplugin` Go package or
+the ResourceSlice controller from that module, these components automatically handle
+ResourceSlice naming to ensure they are evaluated in the order specified by the driver.
+
 ## How resource allocation with DRA works {#how-it-works}
 
 The following sections describe the workflow for the various
@@ -481,7 +497,10 @@ dynamic resource allocation.
 
 1. **Resource allocation**: after finding an eligible ResourceSlice for a
    Pod's ResourceClaim, the Kubernetes scheduler updates the ResourceClaim
-   with the allocation details.
+   with the allocation details. The scheduler uses a first-fit strategy and
+   evaluates pools and ResourceSlices in lexicographical order by their names.
+   Drivers can prioritize specific slices or pools by naming them appropriately.
+   For details, see [Naming and prioritization](#resourceslice-naming-and-prioritization).
 1. **Pod scheduling**: when resource allocation is complete, the scheduler
    places the Pod on a node that can access the allocated resource. The device
    driver and the kubelet on that node configure the device and the Pod's access
