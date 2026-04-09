@@ -1399,6 +1399,80 @@ themselves. That means writing `DeviceMetadata` JSON at the correct file paths,
 incrementing `metadata.generation` on every update, and exposing the files
 read-only inside the container through CDI or an equivalent mechanism.
 
+### List type attributes {#list-type-attributes}
+
+{{< feature-state feature_gate_name="DRAListTypeAttributes" >}}
+
+This feature improves the ResourceSlice API, allowing DRA drivers to specify list values for device attributes instead of only scalars.
+This is useful for modeling more complex internal node topologies, for example when a CPU has adjacency to multiple PCIe roots.
+
+For ResourceClaim authors (end users), this means that the `matchAttribute` and `distinctAttribute` work better for these cases. 
+
+- `matchAttribute` — the two attributes must have a *non-empty list intersection*, rather than be identical (scalar values are treated as single-item lists). 
+  This just means that if one driver publishes a single value for, say, the PCIe root, and another driver publishes a list, the constraint is met as long as 
+  the single value appears somewhere in the list.
+- `distinctAttribute` — the attribute values must be *pairwise-disjoint* (no value shared between any two devices)
+
+To help ResourceClaim authors use attributes that may be lists inside CEL expressions, this feature also introduces an `includes()` CEL function.
+
+```
+# Scalar attribute (backward compatible)
+# assume: device.attributes["dra.example.com"].model = "model-a"
+device.attributes["dra.example.com"].model.includes("model-a")  # true
+device.attributes["dra.example.com"].model.includes("model-b")  # false
+
+# List-type attribute (requires DRAListTypeAttributes)
+# assume: device.attributes["dra.example.com"].supported-models= ["model-a", "model-b"]
+device.attributes["dra.example.com"].supported-models.includes("model-a")  # true
+device.attributes["dra.example.com"].supported-models.includes("model-c")  # false
+```
+
+#### Details for DRA Driver Authors
+
+By default, each `DeviceAttribute` holds exactly one scalar value: a boolean, an integer,
+a string, or a semantic version string. The `DRAListTypeAttributes` feature gate extends
+`DeviceAttribute` with four list-type fields, allowing a device to advertise multiple
+values for a single attribute:
+
+- **`bools`** — a list of boolean values
+- **`ints`** — a list of 64-bit integer values
+- **`strings`** — a list of strings (each at most 64 characters)
+- **`versions`** — a list of semantic version strings per semver.org spec 2.0.0
+  (each at most 64 characters)
+
+The total number of individual attribute values per device (scalar fields plus all list
+elements combined) is limited to **48**. When any device in a ResourceSlice uses this feature or other advanced features such as taints,
+the ResourceSlice will be limited to at most **64** devices.
+use list-type attributes or other advanced features such as taints.
+
+Here is an example of a device advertising multiple supported models using a list-type
+string attribute:
+
+```yaml
+kind: ResourceSlice
+apiVersion: resource.k8s.io/v1
+metadata:
+  name: example-resourceslice
+spec:
+  nodeName: worker-1
+  pool:
+    name: pool
+    generation: 1
+    resourceSliceCount: 1
+  driver: dra.example.com
+  devices:
+  - name: gpu-0
+    attributes:
+      dra.example.com/supported-models:
+        strings:
+        - model-a
+        - model-b
+```
+
+List type attributes is an *alpha feature* and only enabled when the
+`DRAListTypeAttributes` [feature gate](/docs/reference/command-line-tools-reference/feature-gates/)
+is enabled in the kube-apiserver and kube-scheduler.
+
 ## {{% heading "whatsnext" %}}
 
 - [Set Up DRA in a Cluster](/docs/tasks/configure-pod-container/assign-resources/set-up-dra-cluster/)
