@@ -15,7 +15,7 @@ to apply group-level policies such as gang scheduling rather than treating each 
 
 ## Specifying a scheduling group
 
-When the [`GenericWorkload`]((/docs/reference/command-line-tools-reference/feature-gates/#GenericWorkload))
+When the [`GenericWorkload`](/docs/reference/command-line-tools-reference/feature-gates/#GenericWorkload)
 feature gate is enabled,
 you can set the `spec.schedulingGroup` field in your `Pod` manifest. This field establishes a link to a specific `PodGroup` object in the same namespace by name.
 
@@ -45,8 +45,8 @@ When you set `spec.schedulingGroup`, the scheduler looks up the referenced
 * If the `PodGroup` uses the `basic` policy, each `Pod` is scheduled independently using
   standard Kubernetes behavior. The grouping is used as group-level label.
 * If the `PodGroup` uses the `gang` policy, the `Pod` enters an "all-or-nothing" scheduling
-  lifecycle. It waits until at least `minCount` `Pods` in the group can be placed
-  simultaneously before any of them bind to nodes.
+  lifecycle. The scheduler tries to place at least `minCount` `Pods` in the group
+  simultaneously; none of them bind to nodes unless the minimum is met.
 
 ## Missing PodGroup reference
 
@@ -59,5 +59,5 @@ because the scheduler requires the `PodGroup` to determine the policy.
 ## {{% heading "whatsnext" %}}
 
 * Learn about the [PodGroup API](/docs/concepts/workloads/podgroup-api/) and its lifecycle.
-* Read about [PodGroup scheduling policies](/docs/concepts/workloads/workload-api/policies/) (`basic` and `gang`).
+* Read about [PodGroup scheduling policies](/docs/concepts/workloads/workload-api/policies/).
 * Understand the [gang scheduling](/docs/concepts/scheduling-eviction/gang-scheduling/) algorithm.

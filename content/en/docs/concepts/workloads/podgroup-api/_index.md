@@ -18,15 +18,13 @@ for a specific instance of that group.
 
 The PodGroup API resource is part of the `scheduling.k8s.io/v1alpha2`
 {{< glossary_tooltip text="API group" term_id="api-group" >}}
-(and your cluster must have that API group enabled, as well as the `GenericWorkload`
+and your cluster must have that API group enabled, as well as the `GenericWorkload`
 [feature gate](/docs/reference/command-line-tools-reference/feature-gates/),
-before you can use this API).
+before you can use this API.
 
-Workload controllers such as [Job](/docs/concepts/workloads/controllers/job/), JobSet,
-or LeaderWorkerSet create PodGroup objects from the
-[PodGroupTemplates](/docs/concepts/workloads/workload-api/) defined in a Workload.
-Each PodGroup is a self-contained scheduling unit: it carries its own copy of the
-scheduling policy and tracks its own status independently.
+A PodGroup is a self-contained scheduling unit. It defines the group of Pods that should be scheduled together, carries the
+scheduling policy that governs placement, and records the runtime status of that
+scheduling decision.
 
 ## API structure
 
@@ -36,8 +34,9 @@ a `status` that reflects the current scheduling state.
 ### Scheduling policy
 
 Each PodGroup carries a [scheduling policy](/docs/concepts/workloads/workload-api/policies/)
-(`basic` or `gang`) in `spec.schedulingPolicy`. This policy is copied from the Workload's
-PodGroupTemplate at creation time, making each PodGroup self-contained.
+(`basic` or `gang`) in `spec.schedulingPolicy`. When a workload controller creates
+the PodGroup, this policy is copied from the Workload's PodGroupTemplate at creation time.
+For standalone PodGroups, you set the policy directly.
 
 ```yaml
 spec:
@@ -65,13 +64,24 @@ The scheduler updates `status.conditions` to report whether the group has been
 successfully scheduled. The primary condition is `PodGroupScheduled`, which is `True`
 when all required Pods have been placed and `False` when scheduling fails.
 
+{{< note >}}
+The `PodGroupScheduled` condition reflects the initial scheduling decision only.
+The scheduler does not update it if Pods later fail or are evicted. See
+[Limitations](/docs/concepts/workloads/podgroup-api/lifecycle/#limitations)
+for details.
+{{< /note >}}
+
 See the [PodGroup lifecycle](/docs/concepts/workloads/podgroup-api/lifecycle/#podgroup-status)
 page for the full list of conditions and reasons.
 
 ## Creating a PodGroup
 
-A PodGroup belongs to the `scheduling.k8s.io/v1alpha2`
+A PodGroup API resource is part of the `scheduling.k8s.io/v1alpha2`
 {{< glossary_tooltip text="API group" term_id="api-group" >}}.
+(and your cluster must have that API group enabled, as well as the `GenericWorkload`
+[feature gate](/docs/reference/command-line-tools-reference/feature-gates/),
+before you can use this API).
+
 The following manifest creates a PodGroup with a gang scheduling policy that requires
 at least 4 Pods to be schedulable simultaneously:
 
@@ -82,10 +92,6 @@ metadata:
   name: training-worker-0
   namespace: default
 spec:
-  podGroupTemplateRef:
-    workload:
-      workloadName: training-policy
-      podGroupTemplateName: worker
   schedulingPolicy:
     gang:
       minCount: 4
@@ -111,6 +117,10 @@ The relationship between controllers, Workloads, PodGroups, and Pods follows thi
 2. For each runtime instance, the controller creates a PodGroup from one of the Workload's PodGroupTemplates.
 3. The controller creates Pods that reference the PodGroup
    via the `spec.schedulingGroup.podGroupName` field.
+
+The [Job](/docs/concepts/workloads/controllers/job/) controller is the only built-in
+workload controller that follows this pattern for now.
+Custom controllers can implement the same flow for their own workload types.
 
 ```yaml
 apiVersion: scheduling.k8s.io/v1alpha2

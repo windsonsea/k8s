@@ -29,8 +29,12 @@ Controllers must create objects in this order:
 2. `PodGroup` — the runtime instance.
 3. `Pods` — with `spec.schedulingGroup.podGroupName` pointing to the `PodGroup`.
 
+If a `PodGroup` includes a `podGroupTemplateRef` that points to a `Workload` that does
+not exist (or is being deleted), the API server rejects the `PodGroup` creation request.
+The referenced `Workload` must exist before the `PodGroup` can be created.
+
 If a `Pod` references a `PodGroup` that does not yet exist, the `Pod` remains pending.
-The scheduler automatically reconsiders the `Pod` once the `PodGroup` is created.
+The scheduler automatically queues the `Pod` for scheduling once the `PodGroup` is created.
 
 ## Deletion protection
 
@@ -40,11 +44,11 @@ A dedicated finalizer ensures that deletion is blocked until all `Pods` referenc
 
 ## Controller-managed and user-managed PodGroups
 
-In most cases, workload controllers (i.e., Job, etc...) create `PodGroups` automatically
+In most cases, workload controllers (for example, Job) create `PodGroups` automatically
 (controller-managed). The controller determines the `podGroupName` for each Pod
 at creation time, similar to how a `DaemonSet` sets node affinity per Pod.
 
-For advanced use cases, you can create `PodGroup` objects directly and set
+If you need more control over naming and lifecycle, you can create `PodGroup` objects directly and set
 `spec.schedulingGroup.podGroupName` in your Pod templates yourself
 (user-managed). This gives you full control over `PodGroup` creation and naming.
 
@@ -57,6 +61,9 @@ For advanced use cases, you can create `PodGroup` objects directly and set
 * The `spec.schedulingGroup` field on a Pod is immutable.
   Once set, a Pod cannot move to a different PodGroup.
 * The maximum number of `PodGroupTemplates` in a single `Workload` is 8.
+* The `PodGroupScheduled` condition reflects the outcome of the initial scheduling
+  attempt only. Once the condition is set to `True`, the scheduler does not update it
+  if Pods later fail, are evicted, or stop running.
 
 ## {{% heading "whatsnext" %}}
 

@@ -9,9 +9,10 @@ simple_list: true
 
 The `Workload` API resource defines the scheduling requirements and structure of a multi-Pod
 application. While workload controllers such as [Job](/docs/concepts/workloads/controllers/job/)
-provide runtime behavior, the `Workload` specifies how groups of `Pods` should be scheduled.
-Controllers use the `Workload`'s `PodGroupTemplates` to create
-[PodGroup](/docs/concepts/workloads/podgroup-api/) objects at runtime.
+manage the application's runtime state, the `Workload` specifies how groups of `Pods`
+should be scheduled. The Job controller is the only built-in controller that creates
+[PodGroup](/docs/concepts/workloads/podgroup-api/) objects from the `Workload`'s
+`PodGroupTemplates` at runtime.
 
 <!-- body -->
 
@@ -19,9 +20,9 @@ Controllers use the `Workload`'s `PodGroupTemplates` to create
 
 The Workload API resource is part of the `scheduling.k8s.io/v1alpha2`
 {{< glossary_tooltip text="API group" term_id="api-group" >}}
-(and your cluster must have that API group enabled, as well as the `GenericWorkload`
+and your cluster must have that API group enabled, as well as the `GenericWorkload`
 [feature gate](/docs/reference/command-line-tools-reference/feature-gates/),
-before you can use this API).
+before you can use this API.
 
 A `Workload` is a static, long-lived policy template. It defines what scheduling
 policies should be applied to groups of Pods, but does not track runtime state itself.
@@ -31,7 +32,8 @@ objects, which controllers create from the `Workload`'s `PodGroupTemplates`.
 ## API structure
 
 A `Workload` consists of two fields: a list of `PodGroupTemplates` and an optional controller
-reference. All fields are immutable after creation.
+reference. The entire `Workload` spec is immutable after creation: you cannot modify
+existing templates, add new templates, or remove templates from `podGroupTemplates`.
 
 ### PodGroupTemplates
 
@@ -97,7 +99,7 @@ JobSet) may manage their own Workload and PodGroup objects independently.
 
 ## {{% heading "whatsnext" %}}
 
-* Learn about [PodGroup scheduling policies](/docs/concepts/workloads/workload-api/policies/) (`basic` and `gang`).
+* Learn about [PodGroup scheduling policies](/docs/concepts/workloads/workload-api/policies/).
 * See how PodGroups are created from Workloads in the [PodGroup API](/docs/concepts/workloads/podgroup-api/) overview.
 * Read about how Pods reference their PodGroup via the [scheduling group](/docs/concepts/workloads/pods/scheduling-group/) field.
 * Learn about [Topology-aware workload scheduling](/docs/concepts/workloads/workload-api/topology-aware-scheduling/).
