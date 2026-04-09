@@ -64,6 +64,24 @@ The `controllerRef` field links the Workload back to the specific high-level obj
 such as a [Job](/docs/concepts/workloads/controllers/job/) or a custom CRD. This is useful for observability and tooling.
 This data is not used to schedule or manage the Workload.
 
+## Gang scheduling with Jobs
+
+{{< feature-state feature_gate_name="EnableWorkloadWithJob" >}}
+
+When the
+[`EnableWorkloadWithJob`](/docs/reference/command-line-tools-reference/feature-gates/)
+feature gate is enabled, the
+[Job](/docs/concepts/workloads/controllers/job/) controller automatically
+creates Workload and PodGroup objects for parallel indexed Jobs where
+`.spec.parallelism` equals `.spec.completions`. The gang policy's `minCount`
+is set to the Job's parallelism, so all Pods must be schedulable together
+before any of them are bound to nodes.
+
+This is the built-in path for using gang scheduling with Jobs.
+You do not need to create Workload or PodGroup objects yourself as the Job
+controller handles it automatically. Other workload controllers (such as
+JobSet) may manage their own Workload and PodGroup objects independently.
+
 ## {{% heading "whatsnext" %}}
 
 * See how to [reference a Workload](/docs/concepts/workloads/pods/workload-reference/) in a Pod.
