@@ -14,17 +14,17 @@ author: >
   TBD
 ---
 
-Scheduling large AI/ML and batch workloads is a much more complex operation than scheduling a single Pod.
+AI/ML and batch workloads introduce unique scheduling challenges that go beyond simple Pod-by-Pod scheduling.
 In Kubernetes v1.35, we introduced the first tranche of *workload-aware scheduling* improvements,
 featuring the foundational Workload API alongside basic *gang scheduling* support built on a Pod-based framework,
 and an *opportunistic batching* feature to efficiently process identical Pods.
 
-Now, Kubernetes v1.36 brings a massive architectural upgrade. We have redesigned the API to cleanly separate concerns:
-the Workload API now serves as a static template, while the new PodGroup API describes the runtime object.
-To power this, the `kube-scheduler` features a new *PodGroup scheduling cycle* that enables atomic workload processing
-and paves the way for future enhancements. We are also rolling out the first iterations of *topology-aware scheduling*
-and *workload-aware preemption* to advance the scheduling capabilities for these workloads. Additionally,
-we have added *ResourceClaim support for workloads* to unlock *Dynamic Resource Allocation
+Kubernetes v1.36 introduces a significant architectural evolution by cleanly separating API concerns:
+the Workload API acts as a static template, while the new PodGroup API handles the runtime state.
+To support this, the `kube-scheduler` features a new *PodGroup scheduling cycle* that enables atomic workload processing
+and paves the way for future enhancements. This release also debuts the first iterations of *topology-aware scheduling*
+and *workload-aware preemption* to advance scheduling capabilities. Additionally,
+*ResourceClaim support for workloads* unlocks *Dynamic Resource Allocation
 ([DRA](/docs/concepts/scheduling-eviction/dynamic-resource-allocation/))* for PodGroups. Finally,
 to demonstrate real-world readiness, v1.36 delivers the first phase of integration between the Job controller and the new API.
 
@@ -36,16 +36,16 @@ Kubernetes v1.36 introduces the Workload and PodGroup APIs as part of the
 completely replacing the previous `v1alpha1` API version.
 
 In v1.35, Pod groups and their runtime states were embedded within the Workload resource.
-In the new model, the Workload object is rarely updated (as a template object),
-while the PodGroup handles the runtime state. This decoupling also improves performance and scalability,
+The new model decouples these concepts: the Workload now serves as a static template object,
+while the PodGroup manages the runtime state. This separation also improves performance and scalability
 as the PodGroup API allows per-replica sharding of status updates.
 
 Because the Workload API acts merely as a template, the `kube-scheduler`'s logic is streamlined.
 The scheduler can directly read the PodGroup, which contains all the information required by the scheduler,
 without needing to watch or parse the Workload object itself.
 
-Here is what the updated configuration looks like. First, you define the Workload object,
-which now acts as a static template for your Pod groups:
+Here is what the updated configuration looks like. Workload controllers (such as the Job controller)
+define the Workload object, which now acts as a static template for your Pod groups:
 
 ```yaml
 apiVersion: scheduling.k8s.io/v1alpha2
@@ -54,7 +54,8 @@ metadata:
   name: training-job-workload
   namespace: some-ns
 spec:
-  # Pod groups are now defined as templates
+  # Pod groups are now defined as templates,
+  # which contains the PodGroup objects' spec fields.
   podGroupTemplates:
   - name: workers
     schedulingPolicy:
@@ -63,7 +64,7 @@ spec:
         minCount: 4
 ```
 
-Next, workload controllers (such as the Job controller) stamp out runtime PodGroup instances based on those templates.
+Controllers then stamp out runtime PodGroup instances based on those templates.
 The PodGroup runtime object holds the actual scheduling policy and references the template from which it was created.
 It also has a status containing conditions that mirror the states of individual Pods,
 reflecting the overall scheduling state of the group:
@@ -75,7 +76,9 @@ metadata:
   name: training-job-workers-pg
   namespace: some-ns
 spec:
-  # The PodGroup references the Workload template it originated from
+  # The PodGroup references the Workload template it originated from.
+  # In comparison, .metadata.ownerReferences points to the "true" workload object,
+  # e.g., a Job. 
   podGroupTemplateRef:
     workload:
       workloadName: training-job-workload
@@ -93,7 +96,7 @@ status:
 ```
 
 Finally, to bridge this new architecture with individual Pods, the `workloadRef` field in the Pod API has been replaced
-with the schedulingGroup field. When creating Pods, you link them directly to the runtime PodGroup:
+with the `schedulingGroup` field. When creating Pods, you link them directly to the runtime PodGroup:
 
 ```yaml
 apiVersion: v1
@@ -130,8 +133,14 @@ and executes an atomic scheduling cycle as follows:
 3. Based on the algorithm's outcome, the scheduling decision is applied atomically for the entire PodGroup.
 
    * Success: If the placement is found and group constraints are met, the schedulable member Pods
-     are moved directly to the binding phase together.
+     are moved directly to the binding phase together. Any remaining unschedulable Pods are returned
+     to the scheduling queue to wait for available resources so they can join the already scheduled Pods.
 
+     (Note: If new Pods are added to a PodGroup after others are already scheduled,
+     the cycle evaluates the new Pods while accounting for the existing ones.
+     Crucially, Pods already assigned to Nodes remain running. The scheduler will not unassign
+     or evict them, even if the group fails to meet its requirements in subsequent cycles.)
+     
    * Failure: If the group fails to meet its requirements, the entire group is considered unschedulable.
      None of the Pods are bound, and they are returned to the scheduling queue to retry later after a backoff period.
 
@@ -151,9 +160,10 @@ The first version of the PodGroup scheduling cycle comes with certain limitation
   and lack inter-Pod dependencies like affinity, anti-affinity, or topology spread constraints),
   the algorithm is expected to find a placement if one exists.
 
-* For *heterogeneous* Pod groups, finding a valid placement is not guaranteed.
+* For *heterogeneous* Pod groups, finding a valid placement if one exists is not guaranteed,
+  even when the solution might seem trivial.
 
-* For Pod groups with *inter-Pod dependencies*, finding a valid placement is not guaranteed.
+* For Pod groups with *inter-Pod dependencies*, finding a valid placement if one exists is not guaranteed.
 
 In addition to the above, for cases involving *intra-group dependencies*
 (e.g., when the schedulability of one Pod depends on another group member via inter-Pod affinity),
@@ -195,20 +205,20 @@ consisting of three phases:
 
 2. Evaluate each proposed placement to confirm whether the entire PodGroup can actually fit there.
 
-3. Score all feasible placements to select the absolute best fit for the PodGroup. The topology-aware scheduling plugins
+3. Score all feasible placements to select the best fit for the PodGroup. The topology-aware scheduling plugins
    use the new `PlacementScore` extension point to score these placements.
 
 Currently, topology-aware scheduling does not trigger Pod preemption to satisfy constraints.
 However, we plan to integrate workload-aware preemption with topology constraints in the upcoming release.
 
-While Kubernetes v1.36 delivers this foundational topology-aware scheduling, we also plan to significantly
+While Kubernetes v1.36 delivers this foundational topology-aware scheduling, the Kubernetes project is planning
 expand its capabilities soon. Future updates will introduce support for multiple topology levels,
 soft constraints (preferences), deeper integration with Dynamic Resource Allocation (DRA),
 and more robust behavior when paired with the `basic` scheduling policy.
 
 ## Workload-aware preemption
 
-To support the new PodGroup scheduling cycle, we have introduced a new type of preemption mechanism
+To support the new PodGroup scheduling cycle, Kubernetes v1.36 introduces a new type of preemption mechanism
 called *workload-aware preemption*. When a PodGroup cannot be scheduled, the scheduler utilizes this mechanism
 to try making a scheduling of this PodGroup possible.
 
@@ -225,8 +235,8 @@ Workload-aware preemption also introduces two additional concepts directly to th
   or if they have to be preempted together in an *all-or-nothing* fashion.
 
 In Kubernetes v1.36, these fields are only respected by the workload-aware preemption mechanism.
-We plan to extend support for these fields to other disruption sources, including default preemption
-used in the Pod-by-Pod scheduling cycle, in future releases.
+The people working on this set of features are hoping to extend support for these fields
+to other disruption sources, including default preemption used in the Pod-by-Pod scheduling cycle, in future releases.
 
 ```yaml
 apiVersion: scheduling.k8s.io/v1alpha2
@@ -382,8 +392,8 @@ You can send your feedback by:
 
 To dive deeper into the architecture and design of these features, read the KEPs:
 
-* [Workload API and gang scheduling](https://github.com/kubernetes/enhancements/tree/master/keps/sig-scheduling/4671-gang-scheduling)
-* [Topology-aware scheduling](https://github.com/kubernetes/enhancements/tree/master/keps/sig-scheduling/5732-topology-aware-workload-scheduling)
-* [Workload-aware preemption](https://github.com/kubernetes/enhancements/tree/master/keps/sig-scheduling/5710-workload-aware-preemption)
-* [DRA ResourceClaim support for workloads](https://github.com/kubernetes/enhancements/tree/master/keps/sig-scheduling/5729-resourceclaim-support-for-workloads)
-* [Workload API support in Job controller](https://github.com/kubernetes/enhancements/tree/master/keps/sig-apps/5547-integrate-workload-with-job)
+* [Workload API and gang scheduling](https://kep.k8s.io/4671)
+* [Topology-aware scheduling](https://kep.k8s.io/5732)
+* [Workload-aware preemption](https://kep.k8s.io/5710)
+* [DRA ResourceClaim support for workloads](https://kep.k8s.io/5729)
+* [Workload API support in Job controller](https://kep.k8s.io/5547)
