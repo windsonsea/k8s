@@ -605,7 +605,17 @@ spec:
 You may also be able to mutate the incoming Pod, at admission time, to unset
 the `.spec.nodeName` field and to use a node selector instead.
 
-## Additional DRA features
+## Limitations
+
+* The Kubernetes scheduler doesn't support
+  [preemption](/docs/concepts/scheduling-eviction/pod-priority-preemption/) for
+  DRA resources. This means that an existing Pod that's running on a node and is
+  using DRA resources can't be preempted by a higher-priority Pod that also needs
+  DRA resources. The high-priority Pod will remain in a pending state until the device
+  becomes available, which happens when the conflicting Pod terminates or is
+  manually deleted.
+
+## DRA beta features {#beta-features}
 
 The following sections describe DRA features that support advanced use
 cases. Usage of them is optional and may only be relevant with DRA
