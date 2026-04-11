@@ -129,6 +129,40 @@ For consistent behavior throughout the entire cycle, the algorithm requires that
 share the same `.spec.schedulerName`. This requirement is validated before the cycle starts,
 and the PodGroup is rejected if the constraint is not met.
 
+## PodGroup conditions
+
+After a PodGroup scheduling cycle completes, the scheduler updates conditions on the
+PodGroup's `status.conditions`:
+
+* `PodGroupScheduled`: reports whether the PodGroup has been successfully scheduled.
+* `DisruptionTarget`: indicates the PodGroup is about to be terminated due to a
+  disruption such as preemption.
+
+### `PodGroupScheduled`
+
+When the scheduling cycle succeeds, the condition is set to `True` with reason
+`Scheduled`. For `gang` policy PodGroups, this means at least `minCount` Pods were
+placed.
+
+When scheduling fails, the condition is set to `False` with one of the following
+reasons:
+
+* `Unschedulable` — the group could not be placed due to resource constraints,
+  affinity or anti-affinity rules, or insufficient capacity for the gang.
+* `SchedulerError` — scheduling failed because of an internal scheduler error
+  (for example, while parsing scheduling constraints such as `nodeAffinity`).
+
+### `DisruptionTarget`
+
+When the scheduler preempts a PodGroup to make room for higher-priority PodGroups or
+Pods, it sets this condition to `True` with reason `PreemptionByScheduler`.
+
+You can check conditions with:
+
+```shell
+kubectl get podgroup <name> -o jsonpath='{.status.conditions}'
+```
+
 ## {{% heading "whatsnext" %}}
 
 * Learn about the [Workload API](/docs/concepts/workloads/workload-api/).
