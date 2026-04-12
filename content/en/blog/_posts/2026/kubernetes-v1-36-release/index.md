@@ -62,28 +62,101 @@ This work was done as part of [KEP #3476](https://github.com/kubernetes/enhancem
 
 ### CSI driver opt-in for service account tokens via secrets field
 
+Security for storage integrations reaches a higher standard in Kubernetes v1.36 with the graduation of CSI Service Account Token Secret Redaction to Stable. This improvement eliminates a long-standing security risk where sensitive service account tokens, intended only for the storage driver, were inadvertently exposed within the Secret field of CSI volume objects, making them visible to unauthorized users with basic read access to the API.
+
+Now, Kubernetes automatically ensures that these short-lived tokens are handled through dedicated, secure channels rather than being bundled into persistent secrets. This change hardens the security posture of clusters by enforcing the principle of least privilege, preventing token leakage and ensuring that workload identities remain protected throughout the entire storage lifecycle.
+
+This work was done as part of [KEP #5538](https://github.com/kubernetes/enhancements/issues/5538) led by SIG Storage.
+
 ### Mutable CSINode Allocatable Property
+
+The management of node storage capacity becomes significantly more dynamic in Kubernetes v1.36 with the graduation of Mutable CSINode Allocatable to Stable. This update moves away from the historical limitation where the storage resource limits for a node, such as the maximum number of volumes a node can handle, were static and only set during the initial registration of the CSI driver.
+
+Now, CSI drivers can update their volume limits and capacity information on the fly without requiring a restart of the driver or the kubelet. This flexibility is essential for modern cloud environments where node resources can change dynamically, ensuring that the Kubernetes scheduler always has an accurate view of storage availability and preventing pod scheduling failures caused by outdated volume limits.
+
+This work was done as part of [KEP #4876](https://github.com/kubernetes/enhancements/issues/4876) led by SIG Storage.
 
 ### Speed up recursive SELinux label change
 
+In Kubernetes v1.36, the `SELinuxMountReadWriteOncePod` and `SELinuxChangePolicy` features graduate to GA, completing a multi‑release effort to dramatically speed up SELinux volume relabeling for pods. Instead of recursively changing the SELinux label of every file on a volume at container start, Kubernetes can now mount volumes directly with the correct label when certain access modes are used. This significantly reduces container startup time for workloads with large volumes, cutting down on long cold starts and noisy-node behavior in SELinux‑enforcing environments. 
+
+The new `SELinuxChangePolicy` option lets you opt pods into this optimized behavior safely, with controllers emitting warnings when they detect configurations that will stop working in future releases. With these features stable, clusters running with SELinux enabled get a more predictable, performant startup path while setting the stage for stricter, safer SELinux enforcement in Kubernetes 1.37 and beyond.
+
+This work was done as a part of [KEP #1710](http://kep.k8s.io/1710) led by SIG Node and SIG Storage. 
+
 ### API for external signing of Service Account tokens
+
+In Kubernetes v1.36, the `ExternalServiceAccountTokenSigner` feature for service accounts graduates to stable, making it possible to offload token signing to an external system while still integrating cleanly with the Kubernetes API. Clusters can now rely on an external JWT signer for issuing projected service account tokens that follow the standard service account token format, including support for extended expiration when needed. This is especially useful for clusters that already rely on external identity or key management systems, allowing Kubernetes to integrate without duplicating key management inside the control plane.
+
+The kube-apiserver is wired to discover public keys from the external signer, cache them, and validate tokens it did not sign itself, so existing RBAC and authentication flows continue to work as expected. Over the alpha and beta phases, the API and configuration for the external signer plugin, path validation, and OIDC discovery were hardened to handle real-world deployments and rotation patterns safely. 
+
+With GA in v1.36, `ExternalServiceAccountTokenSigner` is now a fully supported option for platforms that centralize identity and signing, simplifying integration with external IAM systems and reducing the need to manage signing keys directly inside the control plane.
+
+This work was done as part of [KEP #740](https://github.com/kubernetes/enhancements/issues/740) led by SIG Auth
 
 ### DRA features graduating to Stable
 
+Part of the Dynamic Resource Allocation (DRA) ecosystem reaches full production maturity in Kubernetes v1.36 as key governance and selection features graduate to Stable. The transition of Admin Access to GA provides a permanent, secure framework for cluster administrators to access and manage hardware resources globally, while the stabilization of Prioritized Lists ensures that resource selection logic remains consistent and predictable across all cluster environments.
+
+Now, organizations can confidently deploy mission-critical hardware automation with the guarantee of long-term API stability and backward compatibility. These features empower users to implement sophisticated resource-sharing policies and administrative overrides that are essential for large-scale GPU clusters and multi-tenant AI platforms, marking the completion of the core architectural foundation for next-generation resource management.
+
+This work was done as part of KEPs [#5018](https://github.com/kubernetes/enhancements/issues/5018) and [#4816](https://github.com/kubernetes/enhancements/issues/4816) led by SIG Auth and SIG Scheduling.
+
 ### Mutating Admission Policies
+
+Declarative cluster management reaches a new level of sophistication in Kubernetes v1.36 with the graduation of Mutating Admission Policies to Stable. This milestone provides a native, high-performance alternative to traditional webhooks by allowing administrators to define resource mutations directly in the API server using the Common Expression Language (CEL), fully replacing the need for external infrastructure for many common use cases.
+
+Now, cluster operators can modify incoming requests without the latency and operational complexity associated with managing custom admission webhooks. By moving mutation logic into a declarative, versioned policy, organizations can achieve more predictable cluster behavior, reduced network overhead, and a hardened security model with the full guarantee of long-term API stability.
+
+This work was done as part of [KEP #3962](https://github.com/kubernetes/enhancements/issues/3962) led by SIG API Machinery.
 
 ### Declarative Validation Of Kubernetes Native Types With validation-gen
 
+The development of custom resources reaches a new level of efficiency in Kubernetes v1.36 as Declarative Validation with validation-gen graduates to Stable. This milestone replaces the manual and often error-prone task of writing complex OpenAPI schemas by allowing developers to define sophisticated validation logic directly within Go struct tags using the Common Expression Language (CEL).
+
+Now, developers can rely on a fully stabilized toolset to automatically generate robust API validation rules at compile-time, ensuring that Custom Resource Definitions (CRDs) remain perfectly synchronized with their source code. By baking validation directly into the development workflow, this enhancement eliminates configuration drift and guarantees that high-quality, self-validating APIs are delivered with long-term compatibility and reduced maintenance overhead.
+
+This work was done as part of [KEP #5073](https://github.com/kubernetes/enhancements/issues/5073) led by SIG API Machinery.
+
 ### Remove gogo protobuf dependency for Kubernetes API types
+
+Security and long-term maintainability for the Kubernetes codebase take a major step forward in Kubernetes v1.36 with the graduation of the Gogo Protobuf Removal to Stable. This initiative eliminates a significant dependency on the unmaintained `gogoprotobuf` library, which had become a source of potential security vulnerabilities and a blocker for adopting modern Go language features.
+
+Now, the project has successfully transitioned to the official `google.golang.org/protobuf` and `protoc-gen-go` toolchains, ensuring that core Kubernetes components are built on a modern, actively supported foundation. While this change is largely internal to the codebase, it guarantees a more secure and stable ecosystem for all users by removing technical debt and enabling the project to leverage the latest performance optimizations and security patches in the Go ecosystem.
+
+This work was done as part of [KEP #5589](https://github.com/kubernetes/enhancements/issues/5589) led by SIG API Machinery.
 
 ### Node log query
 
+Previously, Kubernetes required cluster administrators to log into nodes via SSH or implement a client-side reader for debugging issues pertaining to control-plane or worker nodes. While certain issues still require direct node access, issues with the kube-proxy or kubelet can be diagnosed by inspecting their logs. Node logs offer cluster administrators a method to view these logs using the kubelet API and kubectl plugin to simplify troubleshooting without logging into nodes, similar to debugging issues related to a pod or container. This method is operating system agnostic and requires the services or nodes to log to `/var/log`. 
+
+As this feature reaches GA in Kubernetes 1.36 after thorough performance validation on production workloads, it is enabled by default on the kubelet through the `NodeLogQuery` feature gate. In addition, the `enableSystemLogQuery` kubelet configuration option must also be enabled. 
+
+This work was done as a part of [KEP #2258](http://kep.k8s.io/2258) led by SIG Windows.
+
 ### Support User Namespaces in pods
+
+Container isolation and node security reach a major maturity milestone in Kubernetes v1.36 as support for User Namespaces graduates to Stable. This long-awaited feature provides a critical layer of defense-in-depth by allowing the mapping of a container's root user to a non-privileged user on the host, ensuring that even if a process escapes the container, it possesses no administrative power over the underlying node.
+
+Now, cluster operators can confidently enable this hardened isolation for production workloads to mitigate the impact of container breakout vulnerabilities. By decoupling the container's internal identity from the host's identity, Kubernetes provides a robust, standardized mechanism to protect multi-tenant environments and sensitive infrastructure from unauthorized access, all with the full guarantee of long-term API stability.
+
+This work was done as part of [KEP #127](https://github.com/kubernetes/enhancements/issues/127) led by SIG Node.
 
 ### Support PSI based on cgroupv2
 
+Node resource management and observability become more precise in Kubernetes v1.36 as the export of Pressure Stall Information (PSI) metrics graduates to Stable. This feature provides the kubelet with the ability to report "pressure" metrics for CPU, memory, and I/O, offering a more granular view of resource contention than traditional utilization metrics.
+
+Now, cluster operators and autoscalers can distinguish between a system that is simply busy and one that is actively stalling due to resource exhaustion. By leveraging these high-fidelity signals, users can more accurately tune pod resource requests, improve the reliability of vertical autoscaling, and detect "noisy neighbor" effects before they lead to application performance degradation or node instability.
+
+This work was done as part of [KEP #4205](https://github.com/kubernetes/enhancements/issues/4205) led by SIG Node.
+
 ### VolumeSource: OCI Artifact and/or Image
 
+The distribution of container data becomes more flexible in Kubernetes v1.36 as OCI Volume Sources graduate to Stable. This feature moves beyond the traditional requirement of mounting volumes from external storage providers or config maps by allowing the kubelet to pull and mount content directly from any OCI-compliant registry, such as a container image or an artifact repository.
+
+Now, developers and platform engineers can package application data, models, or static assets as OCI artifacts and deliver them to pods using the same registries and versioning workflows they already use for container images. This convergence of image and volume management simplifies CI/CD pipelines, reduces dependency on specialized storage backends for read-only content, and ensures that data remains portable and securely accessible across any environment.
+
+This work was done as part of [KEP #4639](https://github.com/kubernetes/enhancements/issues/4639) led by SIG Node.
 
 ## New features in Beta
 
@@ -91,43 +164,145 @@ This is a selection of some of the improvements that are now beta following the 
 
 ### IP/CIDR validation improvements
 
+In Kubernetes v1.36, the `StrictIPCIDRValidation` feature for API IP and CIDR fields graduates to beta, tightening validation to catch malformed addresses and prefixes that previously slipped through. This helps prevent subtle configuration bugs where Services, Pods, NetworkPolicies, or other resources reference invalid IPs, which could otherwise lead to confusing runtime behavior or security surprises. 
+
+Controllers are updated to canonicalize IPs they write back into objects and to warn when they encounter bad values that were already stored, so clusters can gradually converge on clean, consistent data. The stricter checks are guarded by a feature gate and have been iterated in alpha with feedback from real clusters, focusing on improving safety without breaking valid but unusual configurations. 
+
+With beta, `StrictIPCIDRValidation` is ready for wider use, giving operators more reliable guardrails around IP-related configuration as they evolve networks and policies over time.
+
+This work was done as a part of [KEP #4858](https://github.com/kubernetes/enhancements/issues/4858) led by SIG Network
+
 ### Separate kubectl user preferences from cluster configs
+
+In Kubernetes v1.36, the `.kuberc` feature for kubectl user preferences continues to mature, building on its earlier alpha and beta releases to make client‑side customization first‑class. With `~/.kube/kuberc`, you can keep aliases, default flags, color and output tweaks, and other personal settings separate from kubeconfig files that hold cluster endpoints and credentials. This separation helps avoid breaking CI pipelines or shared kubeconfigs with someone’s local preferences, while still letting users carry a consistent kubectl experience across all clusters and contexts. 
+
+The schema, `kubectl.config.k8s.io/v1beta1`, supports defining aliases, default options, and credential plugin policies (including allowlists), so teams can also codify safer authentication practices for kubectl. With this release, kuberc is documented, covered by tests, and enabled via feature gate and environment variable controls, making it ready for wider adoption in both developer laptops and automated environments.
+
+This work was done as a part of [KEP #3104](https://github.com/kubernetes/enhancements/issues/3104) led by SIG Auth
 
 ### Mutable Container Resources when Job is suspended
 
+In Kubernetes v1.36, the MutablePodResourcesForSuspendedJobs feature for Jobs graduates to beta, relaxing validation so you can update container CPU, memory, GPU, and extended resource requests and limits while a Job is suspended. This gives queue controllers and operators a safe hook to right‑size batch workloads based on real‑time cluster conditions, rather than locking in resource guesses made at submit time. For example, a queueing system can suspend incoming Jobs, adjust their resource requirements to match available capacity or quota, then unsuspend them once the cluster can actually run them. 
+
+The feature carefully scopes mutability to suspended Jobs (and Jobs whose pods have been terminated on suspension), avoiding disruptive changes to actively running pods while still enabling workflows like “checkpoint, suspend, resize, resume.” With beta, the feature is enabled by default behind two feature gates, covered by unit, integration, and (for beta) e2e tests, and is already in use by higher‑level controllers such as Kueue and JobSet for more efficient GPU and batch scheduling.
+
+This work was done as a part of [KEP #5440](https://github.com/kubernetes/enhancements/issues/5440) led by SIG Apps.
+
 ### Constrained Impersonation
+
+In Kubernetes v1.36, the `ConstrainedImpersonation` feature for user impersonation graduates to beta, tightening a historically all‑or‑nothing mechanism into something that can actually follow least‑privilege principles. When this feature is enabled, an impersonator must have two distinct sets of permissions: one to impersonate a given identity, and another to perform specific actions on that identity’s behalf. This prevents support tools, controllers, or node agents from using impersonation to gain broader access than they themselves are allowed, even if their impersonation RBAC is misconfigured. Existing impersonate rules keep working, but the API server prefers the new constrained checks first, making the transition incremental instead of a flag day. With beta in v1.36, `ConstrainedImpersonation` is tested, documented, and ready for wider adoption by platform teams that rely on impersonation for debugging, proxying, or node‑level controllers.
+
+This work was done as a part of [KEP #5284](https://github.com/kubernetes/enhancements/issues/5284) led by SIG Auth
 
 ### DRA features in beta
 
-### Statusz for Kubernetes Components 
+The Dynamic Resource Allocation (DRA) framework reaches a major maturity milestone in Kubernetes v1.36 as several core features graduate to Beta and are enabled by default. This transition moves DRA beyond basic allocation by introducing Partitionable Devices  and Consumable Capacit, allowing for more granular sharing of hardware like GPUs, while Device Taints and Tolerations  ensure that specialized resources are only utilized by the appropriate workloads.
+
+Now, users benefit from a much more reliable and observable resource lifecycle through Resource Claim Device Status  and the ability to ensure Device Attachment before Pod Scheduling. By integrating these features with Extended Resource support, Kubernetes provides a robust production-ready alternative to the legacy device plugin system, enabling complex AI and HPC workloads to manage hardware with unprecedented precision and operational safety.
+
+This work was done across several KEPs (including [#5004](https://github.com/kubernetes/enhancements/issues/5004), [#4817](https://github.com/kubernetes/enhancements/issues/4817), [#5055](https://github.com/kubernetes/enhancements/issues/5055), [#5075](https://github.com/kubernetes/enhancements/issues/5075), [#4815](https://github.com/kubernetes/enhancements/issues/5075), and [#5007](https://github.com/kubernetes/enhancements/issues/5007)) led by SIG Scheduling and SIG Node.
+
+### Statusz for Kubernetes Components
+
+In Kubernetes v1.36, the `ComponentStatusz` feature for core Kubernetes components graduates to beta, standardizing a `/statusz` endpoint that surfaces real‑time build and version details for each component. This low‑overhead z‑page exposes information like start time, uptime, Go version, binary version, emulation version, and minimum compatibility version, so operators and developers can quickly see exactly what is running without digging through logs or configs. 
+
+The endpoint offers a human‑readable text view by default, plus a versioned structured API (config.k8s.io/Statusz) for programmatic access in JSON, YAML, or CBOR via explicit content negotiation. Access is restricted to the `system:monitoring` group, keeping it aligned with existing protections on health and metrics endpoints and avoiding exposure of sensitive data. 
+
+With beta, `ComponentStatusz` is enabled by default across all core control‑plane components and node agents, backed by unit, integration, and end‑to‑end tests so it can be safely used in production for observability and debugging workflows.
+
+This work was done as a part of [KEP #4827](https://github.com/kubernetes/enhancements/issues/4827) led by SIG Instrumentation
 
 ### Flagz for Kubernetes Components 
 
+In Kubernetes v1.36, the `ComponentFlagz` feature for core Kubernetes components graduates to beta, standardizing a `/flagz` endpoint that exposes the effective command‑line flags each component was started with. This gives cluster operators and developers real‑time, in‑cluster visibility into component configuration, making it much easier to debug unexpected behavior or verify that a flag rollout actually took effect after a restart. 
+
+The endpoint supports both a human‑readable text view and a versioned structured API (initially `config.k8s.io/v1alpha1`), so you can either curl it during an incident or wire it into automated tooling once you are ready. Access is restricted to the `system:monitoring` group and sensitive values can be redacted, keeping configuration insight aligned with existing security practices around health and status endpoints. 
+
+With beta, `ComponentFlagz` is now enabled by default and implemented across all core control‑plane components and node agents, backed by unit, integration, and end‑to‑end tests to ensure the endpoint is reliable in production clusters.
+
+This work was done as a part of [KEP #4828](https://github.com/kubernetes/enhancements/issues/4828) led by SIG Instrumentation
+
 ### Mixed Version Proxy (aka Unknown Version Interoperability Proxy)
+
+In Kubernetes v1.36, the Mixed Version Proxy feature graduates to beta, building on its alpha introduction in v1.28 to provide safer control-plane upgrades for mixed-version clusters. Each API request can now be routed to the apiserver instance that serves the requested group, version, and resource, reducing 404s and failures due to version skew. 
+
+The feature relies on peer-aggregated discovery, so apiservers share information about which resources and versions they expose, then use that data to transparently reroute requests when needed. New metrics on rerouted traffic and proxy behavior help operators understand how often requests are forwarded and to which peers. Together, these changes make it easier to run highly available, mixed-version API control planes in production while performing multi-step or partial control-plane upgrades.
+
+This work was done as a part of [KEP #4020](https://github.com/kubernetes/enhancements/issues/4020) led by SIG API-Machinery
 
 ### Support memory qos with cgroups v2
 
+Kubernetes now enhances MemoryQoS on cgroup v2 nodes with smarter, tiered memory protection that better aligns kernel controls with pod requests and limits, reducing interference and thrashing for workloads sharing the same node. This iteration also refines how kubelet programs memory.high and memory.min, adds metrics and safeguards to avoid livelocks, and introduces configuration options so cluster operators can tune memory protection behavior for their environments.
 
+This work was done as part of [KEP #2570](https://github.com/kubernetes/enhancements/issues/2570) led by SIG Node
 
 ## New features in Alpha
 
 This is a selection of some of the improvements that are now alpha following the v1.36 release.
 
-### Workload Aware Scheduling (WAS) features in Alpha
+### Staleness mitigation for controllers
 
-### Support scaling to/from zero pods for object/external metrics
+Staleness in Kubernetes controllers is a problem that affects many controllers and can subtly affect controller behavior. It is usually not until it is too late, when a controller in production has already taken incorrect action, that staleness is found to be an issue due to some underlying assumption made by the controller author. Some issues caused by staleness include controllers taking incorrect actions, not taking action when they should, and taking too long to act. We are excited to announce that Kubernetes v1.36 includes new features that help mitigate controller staleness and provide better observability of controller behavior.
+
+This work was done as part of [KEP #5647](https://github.com/kubernetes/enhancements/issues/5647) led by SIG API Machinery.
+
+### HPA Scale to Zero for Custom Metrics
+
+Since now, the Horizontal Pod Autoscaler (HPA) required a minimum of at least one replica to remain active, as it could only calculate scaling needs based on metrics (like CPU or Memory) from running pods. Kubernetes v1.36 continues the development of the HPA Scale to Zero feature in Alpha, allowing workloads to scale down to zero replicas specifically when using Object or External metrics.
+
+Now, users can experiment with significantly reducing infrastructure costs by completely idling heavy workloads when no work is pending. While the feature remains behind the HPAScaleToZero feature gate, it enables the HPA to stay active even with zero running pods, automatically scaling the deployment back up as soon as the external metric (e.g., queue length) indicates that new tasks have arrived.
+
+This work was done as part of [KEP #2021](https://github.com/kubernetes/enhancements/issues/2021) led by SIG Autoscaling.
 
 ### DRA features in Alpha
 
+Historically, the Dynamic Resource Allocation (DRA) framework lacked seamless integration with high-level controllers and provided limited visibility into device-specific metadata or availability. Kubernetes v1.36 introduces a wave of DRA enhancements in Alpha, including native ResourceClaim support for Workloads, which allows Deployments and StatefulSets to manage hardware claims automatically, and DRA Native Resources to simplify how drivers define hardware classes.
+
+Now, users can leverage the Downward API to expose complex resource attributes directly to containers and benefit from improved Resource Availability Visibility for more predictable scheduling. These updates, combined with support for List Types in attributes, transform DRA from a low-level primitive into a robust system capable of handling the sophisticated networking and compute requirements of modern AI and high-performance computing (HPC) stacks.
+
+This work was done across several KEPs (including [#5729](https://github.com/kubernetes/enhancements/issues/5729), [#5304](https://github.com/kubernetes/enhancements/issues/5304), [#5517](https://github.com/kubernetes/enhancements/issues/5517), [#5677](https://github.com/kubernetes/enhancements/issues/5677), and [#5491](https://github.com/kubernetes/enhancements/issues/5491)) led by SIG Scheduling and SIG Node.
+
 ### Native Histogram Support for Kubernetes Metrics
+
+High-resolution monitoring reaches a new milestone in Kubernetes v1.36 with the introduction of Native Histogram support in Alpha. While classical Prometheus histograms relied on static, pre-defined buckets that often forced a compromise between data accuracy and memory usage, this update allows the control plane to export sparse histograms that dynamically adjust their resolution based on real-time data.
+
+Now, cluster operators can capture precise latency distributions for the kube-apiserver and other core components without the overhead of manual bucket management. This architectural shift ensures more reliable SLIs and SLOs, providing high-fidelity heatmaps that remain accurate even during the most unpredictable workload spikes.
+
+This work was done as part of [KEP #5808](https://github.com/kubernetes/enhancements/issues/5808) led by SIG Instrumentation.
 
 ### Manifest Based Admission Control Config
 
+Managing admission controllers moves toward a more declarative and consistent model in Kubernetes v1.36 with the introduction of Manifest-based Admission Control Configuration in Alpha. This change addresses the long-standing challenge of configuring admission plugins through disparate command-line flags or separate, complex config files by allowing administrators to define the desired state of admission control directly through a structured manifest.
+
+Now, cluster operators can manage admission plugin settings with the same versioned, declarative workflows used for other Kubernetes objects, significantly reducing the risk of configuration drift and manual errors during cluster upgrades. By centralizing these configurations into a unified manifest, the kube-apiserver becomes easier to audit and automate, paving the way for more secure and reproducible cluster deployments.
+
+This work was done as part of [KEP #5793](https://github.com/kubernetes/enhancements/issues/5793) led by SIG API Machinery.
+
 ### Stale Controller Mitigation
+
+Kubernetes v1.36 introduces a more robust mechanism for Stale Controller Handling in Alpha, addressing the risks posed by "zombie" controllers that continue to act on outdated information after a network partition or a crash. In the past, the lack of a standardized way to detect and block requests from stale controller instances could lead to conflicting updates or data corruption when a new instance of the same controller took over.
+
+Now, the kube-apiserver can leverage the ControllerTerm in the Lease object to verify that a controller is the current valid leader before committing changes. This ensures that only the active, authoritative controller can modify resources, providing higher reliability for mission-critical automation and preventing the race conditions that commonly plague distributed control loops during failover events.
+
+This work was done as part of [KEP #5647](https://github.com/kubernetes/enhancements/issues/5647) led by SIG API Machinery.
 
 ### CRI List Streaming
 
+Cluster performance and scalability receive a significant boost in Kubernetes v1.36 with the introduction of CRI List Streaming in Alpha. This enhancement addresses the memory pressure and latency spikes often seen on large-scale nodes by replacing traditional, monolithic "List" requests between the kubelet and the container runtime with a more efficient server-side streaming RPC.
 
+Now, instead of waiting for a single, massive response containing all container or image data, the kubelet can process results incrementally as they are streamed. This shift significantly reduces the peak memory footprint of the kubelet and improves responsiveness on high-density nodes, ensuring that cluster management remains fluid even as the number of containers per node continues to grow.
+
+This work was done as part of [KEP #5825](https://github.com/kubernetes/enhancements/issues/5825) led by SIG Node.
+
+## Other notable changes
+
+### Ingress NGINX retirement
+
+To prioritize the safety and security of the ecosystem, Kubernetes SIG Network and the Security Response Committee have retired Ingress NGINX on March 24, 2026.
+Since that date, there have been no further releases, no bugfixes, and no updates to resolve any security vulnerabilities discovered. Existing deployments of
+Ingress NGINX will continue to function, and installation artifacts like Helm charts and container images will remain available. 
+
+For full details, see the [official retirement announcement](/blog/2025/11/11/ingress-nginx-retirement/).
 
 ## Graduations, deprecations, and removals in v1.36
 
@@ -160,26 +335,15 @@ This release includes a total of XXX enhancements promoted to stable:
 
 As Kubernetes develops and matures, features may be deprecated, removed, or replaced with better ones to improve the project's overall health. See the Kubernetes deprecation and removal policy for more details on this process. Kubernetes v1.36 includes a couple of deprecations.
 
-### Ingress NGINX retirement
+### Deprecate service.spec.externalIPs
 
-To prioritize the safety and security of the ecosystem, Kubernetes SIG Network and the Security Response Committee have retired Ingress NGINX on March 24, 2026.
-Since that date, there have been no further releases, no bugfixes, and no updates to resolve any security vulnerabilities discovered. Existing deployments of
-Ingress NGINX will continue to function, and installation artifacts like Helm charts and container images will remain available. 
+The `externalIPs` field in Service `spec` is deprecated, which means you no longer have a way to route arbitrary externalIPs to your Services. This field has been a known security headache for years, enabling man-in-the-middle attacks on your cluster traffic, as documented in [CVE-2020-8554](https://github.com/kubernetes/kubernetes/issues/970760). From Kubernetes v1.36 and onwards, you will see deprecation warnings when using it, with full removal planned for v1.43.
 
-For full details, see the [official retirement announcement](/blog/2025/11/11/ingress-nginx-retirement/).
-
-### Deprecate service.spec.externalIPs (#5707)
-
-The `externalIPs` field in Service `spec` is being deprecated, which means you’ll soon lose a quick way to route arbitrary externalIPs to your Services. This
-field has been a known security headache for years, enabling man-in-the-middle attacks on your cluster traffic, as documented in [CVE-2020-8554](https://github.com/kubernetes/kubernetes/issues/970760). From Kubernetes v1.36 and onwards, you will see deprecation warnings when using it, with full removal
-planned for v1.43.
-
-If your Services still lean on `externalIPs`, consider using LoadBalancer services for cloud-managed ingress, NodePort for simple port exposure, or Gateway API
-for a more flexible and secure way to handle external traffic.
+If your Services still lean on `externalIPs`, consider using LoadBalancer services for cloud-managed ingress, NodePort for simple port exposure, or Gateway API for a more flexible and secure way to handle external traffic.
 
 For more details on this enhancement, refer to [KEP-5707: Deprecate service.spec.externalIPs](https://kep.k8s.io/5707)
 
-### Remove gitRepo volume driver (#5040)
+### Remove gitRepo volume driver
 
 The gitRepo volume type has been deprecated since v1.11. Starting Kubernetes v1.36, the `gitRepo` volume plugin is permanently disabled and cannot be turned back
 on. This change protects clusters from a critical security issue where using `gitRepo` could let an attacker run code as root on the node. 
@@ -236,6 +400,13 @@ Explore upcoming Kubernetes and cloud native events, including KubeCon + CloudNa
  
 **June 2026**
 - KCD - [Kubernetes Community Days: New York](https://community.cncf.io/events/details/cncf-kcd-new-york-presents-kcd-new-york-2026/): June 10, 2025 | New York, USA
+- [KubeCon + CloudNativeCon India 2026: June 18-19, 2026](https://events.linuxfoundation.org/kubecon-cloudnativecon-india/) | Mumbai, India
+
+**July 2026**
+- [KubeCon + CloudNativeCon Japan 2026: July 29-30, 2026](https://events.linuxfoundation.org/kubecon-cloudnativecon-japan/) | Yokohama, Japan
+
+**September 2026**
+- [KubeCon + CloudNativeCon China 2026: September 8-9, 2026](https://www.lfopensource.cn/kubecon-cloudnativecon-openinfra-summit-pytorch-conference-china/) | Shanghai, China
 
 **October 2026**
 - KCD - [Kubernetes Community Days: UK: Oct 19, 2026](https://community.cncf.io/events/details/cncf-kcd-uk-presents-kubernetes-community-days-uk-edinburgh-2026/) | Edinburgh, UK
@@ -248,8 +419,10 @@ You can find the latest event details [here](https://community.cncf.io/events/#/
 
 ## Upcoming Release Webinar
 
-Join members of the Kubernetes v1.36 Release Team on 20 May 2026 to learn about the release highlights of this release. For more information and registration, visit the event page on the CNCF Online Programs site.
-Get Involved
+Join members of the Kubernetes v1.36 Release Team on 20 May 2026 at 9 am PT to learn about the release highlights of this release. For more information and registration, visit the event page on the CNCF Online Programs site.
+
+
+## Get Involved
 
 The simplest way to get involved with Kubernetes is by joining one of the many [Special Interest Groups](https://github.com/kubernetes/community/blob/master/sig-list.md) (SIGs) that align with your interests. Have something you’d like to broadcast to the Kubernetes community? Share your voice at our weekly [community meeting](https://github.com/kubernetes/community/tree/master/communication), and through the channels below. Thank you for your continued feedback and support.
 
