@@ -1,7 +1,7 @@
 ---
 title: PodGroup
 id: podgroup
-full_link: /docs/concepts/workloads/workload-api/#pod-groups
+full_link: /docs/concepts/workloads/podgroup-api/
 short_description: >
   A PodGroup represents a set of Pods with common scheduling policy and constraints.
 
