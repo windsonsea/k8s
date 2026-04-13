@@ -256,7 +256,7 @@ This work was done as part of [KEP #2021](https://github.com/kubernetes/enhancem
 
 ### DRA features in Alpha
 
-Historically, the Dynamic Resource Allocation (DRA) framework lacked seamless integration with high-level controllers and provided limited visibility into device-specific metadata or availability. Kubernetes v1.36 introduces a wave of DRA enhancements in Alpha, including native ResourceClaim support for Workloads, which allows Deployments and StatefulSets to manage hardware claims automatically, and DRA Native Resources to simplify how drivers define hardware classes.
+Historically, the Dynamic Resource Allocation (DRA) framework lacked seamless integration with high-level controllers and provided limited visibility into device-specific metadata or availability. Kubernetes v1.36 introduces a wave of DRA enhancements in Alpha, including native ResourceClaim support for workloads, which allows Deployments and StatefulSets to manage hardware claims automatically, and DRA Native Resources to simplify how drivers define hardware classes.
 
 Now, users can leverage the Downward API to expose complex resource attributes directly to containers and benefit from improved Resource Availability Visibility for more predictable scheduling. These updates, combined with support for List Types in attributes, transform DRA from a low-level primitive into a robust system capable of handling the sophisticated networking and compute requirements of modern AI and high-performance computing (HPC) stacks.
 
