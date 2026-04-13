@@ -312,7 +312,7 @@ This lists all the features that graduated to stable (also known as general avai
 
 This release includes a total of XXX enhancements promoted to stable:
 
-- [Support User Namespaces in pods](https://github.com/kubernetes/enhancements/issues/127)
+- [Support User Namespaces in pods](https://kep.k8s.io/127)
 - [API for external signing of Service Account tokens](https://github.com/kubernetes/enhancements/issues/740)
 - [Speed up recursive SELinux label change](https://github.com/kubernetes/enhancements/issues/1710)
 - [Portworx file in-tree to CSI driver migration](https://github.com/kubernetes/enhancements/issues/2589)
