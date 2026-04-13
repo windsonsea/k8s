@@ -12,9 +12,8 @@ _mutable CSI node allocatable count_ feature has graduated to General
 Availability (GA) in Kubernetes v1.36!
 
 This feature, first introduced as alpha in Kubernetes v1.33 and promoted to beta in
-v1.34, allows [Container Storage Interface
-(CSI)](https://kubernetes-csi.github.io/docs/introduction.html) drivers to
-dynamically update the reported maximum number of volumes that a node can handle.
+v1.34, allows [Container Storage Interface (CSI)](https://kubernetes-csi.github.io/docs/introduction.html)
+drivers to dynamically update the reported maximum number of volumes that a node can handle.
 This capability significantly enhances the accuracy of pod scheduling decisions
 and reduces scheduling failures caused by outdated volume capacity information.
 
@@ -103,8 +102,7 @@ To take advantage of this feature in your Kubernetes v1.36 cluster:
 
 ## Getting involved
 
-This feature was driven by the [SIG
-Storage](https://github.com/kubernetes/community/tree/master/sig-storage)
+This feature was driven by the [SIG Storage](https://github.com/kubernetes/community/tree/master/sig-storage)
 community. Please join us to connect with the community and share your ideas
 and feedback around the above feature and beyond. We look forward to hearing
 from you!
