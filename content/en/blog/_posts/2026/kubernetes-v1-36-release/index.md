@@ -11,7 +11,7 @@ release_announcement:
   minor_version: “1.36”
 ---
 
-**Editors:** Chad M. Crowell,  Kirti Goyal, Sophia Ugochukwu, Swathi Rao, Utkarsh Umre
+**Editors:** Chad M. Crowell, Kirti Goyal, Sophia Ugochukwu, Swathi Rao, Utkarsh Umre
 
 Similar to previous releases, the release of Kubernetes v1.36 introduces new stable, beta, and alpha features. The consistent delivery of high-quality releases underscores the strength of our development cycle and the vibrant support from our community.
 
