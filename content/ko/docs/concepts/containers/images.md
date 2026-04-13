@@ -557,7 +557,8 @@ EOF
    - [AlwaysPullImages 어드미션 컨트롤러](/docs/reference/access-authn-authz/admission-controllers/#alwayspullimages)가
      활성화되어 있는지 확인한다. 그렇지 않으면, 모든 파드가 잠재적으로 모든 이미지에 접근 권한을 가진다.
    - 인가가 요구되도록 프라이빗 레지스트리를 실행한다.
-   - 각 테넌트에 대한 레지스트리 자격 증명을 생성하고, 시크릿에 넣고, 각 테넌트 네임스페이스에 시크릿을 채운다.
+   - 각 테넌트에 대한 레지스트리 자격 증명을 생성하고, 시크릿에 넣고,
+     각 테넌트 네임스페이스에 시크릿을 채운다.
    - 테넌트는 해당 시크릿을 각 네임스페이스의 `imagePullSecrets`에 추가한다.
 
 다중 레지스트리에 접근해야 하는 경우, 각 레지스트리에 대해 하나의 시크릿을 생성할 수 있다.
@@ -574,7 +575,6 @@ ECR(Elastic Container Registry), GCR(Google Container Registry)의
 
 쿠버네티스 버전 1.26부터 레거시 메커니즘이 제거되었으므로,
 다음 중 하나를 수행해야 한다.
-
 - 각 노드에 kubelet 이미지 자격증명 제공자를 구성하거나
 - `imagePullSecrets`과 하나 이상의 시크릿을 사용하여 이미지 풀 자격증명을 지정한다.
 
