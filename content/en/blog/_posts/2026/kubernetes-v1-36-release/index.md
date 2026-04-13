@@ -276,7 +276,7 @@ Managing admission controllers moves toward a more declarative and consistent mo
 
 Now, cluster operators can manage admission plugin settings with the same versioned, declarative workflows used for other Kubernetes objects, significantly reducing the risk of configuration drift and manual errors during cluster upgrades. By centralizing these configurations into a unified manifest, the kube-apiserver becomes easier to audit and automate, paving the way for more secure and reproducible cluster deployments.
 
-This work was done as part of [KEP #5793](https://github.com/kubernetes/enhancements/issues/5793) led by SIG API Machinery.
+This work was done as part of [KEP #5793](https://kep.k8s.io/5793) led by SIG API Machinery.
 
 ### Stale Controller Mitigation
 
