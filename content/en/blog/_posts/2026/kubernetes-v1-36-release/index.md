@@ -37,7 +37,7 @@ The `KubeletFineGrainedAuthz` feature gate was introduced as an opt-in alpha fea
 
 ​​This work was done as a part of [KEP #2862](https://kep.k8s.io/2862) led by SIG Auth and SIG Node.
 
-### Beta: Resource Health Status
+### Beta: Resource health status
 
 Previously, Kubernetes lacked a native way to report the health of allocated devices, making it difficult to diagnose Pod crashes caused by hardware failures. Building on the initial Alpha release in v1.31 which focused on Device Plugins, Kubernetes v1.36 expands this feature to support Dynamic Resource Allocation (DRA), introducing the `allocatedResourcesStatus` field to provide a unified health reporting mechanism for all specialized hardware.
 
