@@ -292,7 +292,7 @@ Cluster performance and scalability receive a significant boost in Kubernetes v1
 
 Now, instead of waiting for a single, massive response containing all container or image data, the kubelet can process results incrementally as they are streamed. This shift significantly reduces the peak memory footprint of the kubelet and improves responsiveness on high-density nodes, ensuring that cluster management remains fluid even as the number of containers per node continues to grow.
 
-This work was done as part of [KEP #5825](https://github.com/kubernetes/enhancements/issues/5825) led by SIG Node.
+This work was done as part of [KEP #5825](https://kep.k8s.io/5825) led by SIG Node.
 
 ## Other notable changes
 
