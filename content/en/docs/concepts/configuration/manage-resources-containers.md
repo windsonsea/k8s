@@ -73,7 +73,7 @@ Kubernetes has the following built-in resource types:
 
 | Resource type | Description | Base unit |
 |---|---|---|
-| `cpu` | Compute processing | [Kubernetes CPUs](#meaning-of-cpu) (cores) |
+| `cpu` | Compute processing | cpu (core) |
 | `memory` | RAM | Bytes |
 | `ephemeral-storage` | [Local ephemeral storage](/docs/concepts/storage/ephemeral-storage/) | Bytes |
 | `hugepages-<size>` | [Huge pages](#huge-pages) (Linux only) | Bytes |
