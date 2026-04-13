@@ -196,7 +196,7 @@ This work was done as a part of [KEP #5284](https://github.com/kubernetes/enhanc
 
 ### DRA features in beta
 
-The Dynamic Resource Allocation (DRA) framework reaches a major maturity milestone in Kubernetes v1.36 as several core features graduate to Beta and are enabled by default. This transition moves DRA beyond basic allocation by introducing Partitionable Devices  and Consumable Capacit, allowing for more granular sharing of hardware like GPUs, while Device Taints and Tolerations  ensure that specialized resources are only utilized by the appropriate workloads.
+The Dynamic Resource Allocation (DRA) framework reaches another maturity milestone in Kubernetes v1.36 as several core features graduate to Beta and are enabled by default. This transition moves DRA beyond basic allocation by graduating Partitionable Devices and Consumable Capacity, allowing for more granular sharing of hardware like GPUs, while Device Taints and Tolerations ensure that specialized resources are only utilized by the appropriate workloads.
 
 Now, users benefit from a much more reliable and observable resource lifecycle through Resource Claim Device Status  and the ability to ensure Device Attachment before Pod Scheduling. By integrating these features with Extended Resource support, Kubernetes provides a robust production-ready alternative to the legacy device plugin system, enabling complex AI and HPC workloads to manage hardware with unprecedented precision and operational safety.
 
