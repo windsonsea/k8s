@@ -284,7 +284,7 @@ Kubernetes v1.36 introduces a more robust mechanism for Stale Controller Handlin
 
 Now, the kube-apiserver can leverage the ControllerTerm in the Lease object to verify that a controller is the current valid leader before committing changes. This ensures that only the active, authoritative controller can modify resources, providing higher reliability for mission-critical automation and preventing the race conditions that commonly plague distributed control loops during failover events.
 
-This work was done as part of [KEP #5647](https://github.com/kubernetes/enhancements/issues/5647) led by SIG API Machinery.
+This work was done as part of [KEP #5647](https://kep.k8s.io/5647) led by SIG API Machinery.
 
 ### CRI List Streaming
 
