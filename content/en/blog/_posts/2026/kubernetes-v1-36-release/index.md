@@ -39,7 +39,7 @@ The `KubeletFineGrainedAuthz` feature gate was introduced as an opt-in alpha fea
 
 ### Beta: Resource health status
 
-Previously, Kubernetes lacked a native way to report the health of allocated devices, making it difficult to diagnose Pod crashes caused by hardware failures. Building on the initial Alpha release in v1.31 which focused on Device Plugins, Kubernetes v1.36 expands this feature to support Dynamic Resource Allocation (DRA), introducing the `allocatedResourcesStatus` field to provide a unified health reporting mechanism for all specialized hardware.
+Previously, Kubernetes lacked a native way to report the health of allocated devices, making it difficult to diagnose Pod crashes caused by hardware failures. Building on the initial alpha release in v1.31 which focused on Device Plugins, Kubernetes v1.36 expands this feature to support Dynamic Resource Allocation (DRA), introducing the `allocatedResourcesStatus` field to provide a unified health reporting mechanism for all specialized hardware.
 
 Now, users can use `kubectl describe pod` to determine if a container's crash loop is due to an `Unhealthy` or `Unknown` device status, regardless of whether the hardware was provisioned via traditional plugins or the newer DRA framework. This enhanced visibility allows administrators and automated controllers to quickly identify faulty hardware and streamline the recovery of high-performance workloads.
 This work was done as part of [KEP #4680](https://github.com/kubernetes/enhancements/issues/4680) led by SIG Node.
