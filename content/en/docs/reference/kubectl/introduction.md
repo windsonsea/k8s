@@ -4,7 +4,7 @@ content_type: concept
 weight: 1
 ---
 
-kubectl is a command-line tool for interacting with Kubernetes clusters.
+kubectl is a command-line tool for interacting with Kubernetes clusters, using the Kubernetes API.
 Use it to deploy applications, inspect resources, and manage workloads.
 
 While this Book is focused on using kubectl to declaratively manage applications in Kubernetes, it
