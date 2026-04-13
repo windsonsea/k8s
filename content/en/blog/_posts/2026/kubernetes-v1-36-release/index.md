@@ -310,7 +310,7 @@ For full details, see the [official retirement announcement](/blog/2025/11/11/in
 
 This lists all the features that graduated to stable (also known as general availability). For a full list of updates including new features and graduations from alpha to beta, see the release notes.
 
-This release includes a total of XXX enhancements promoted to stable:
+This release includes a total of 18 enhancements promoted to stable:
 
 - [Support User Namespaces in pods](https://kep.k8s.io/127)
 - [API for external signing of Service Account tokens](https://kep.k8s.io/740)
