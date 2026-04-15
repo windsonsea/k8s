@@ -168,9 +168,7 @@ This is a selection of some of the improvements that are now beta following the 
 
 In Kubernetes v1.36, the `StrictIPCIDRValidation` feature for API IP and CIDR fields graduates to beta, tightening validation to catch malformed addresses and prefixes that previously slipped through. This helps prevent subtle configuration bugs where Services, Pods, NetworkPolicies, or other resources reference invalid IPs, which could otherwise lead to confusing runtime behavior or security surprises. 
 
-Controllers are updated to canonicalize IPs they write back into objects and to warn when they encounter bad values that were already stored, so clusters can gradually converge on clean, consistent data. The stricter checks are guarded by a feature gate and have been iterated in alpha with feedback from real clusters, focusing on improving safety without breaking valid but unusual configurations. 
-
-With beta, `StrictIPCIDRValidation` is ready for wider use, giving operators more reliable guardrails around IP-related configuration as they evolve networks and policies over time.
+Controllers are updated to canonicalize IPs they write back into objects and to warn when they encounter bad values that were already stored, so clusters can gradually converge on clean, consistent data. With beta, `StrictIPCIDRValidation` is ready for wider use, giving operators more reliable guardrails around IP-related configuration as they evolve networks and policies over time.
 
 This work was done as a part of [KEP #4858](https://github.com/kubernetes/enhancements/issues/4858) led by SIG Network
 
