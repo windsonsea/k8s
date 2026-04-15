@@ -48,7 +48,7 @@ This work was done as part of [KEP #4680](https://kep.k8s.io/4680) led by SIG No
 
 Previously, the Kubernetes scheduler and job controllers managed pods as independent units, often leading to fragmented scheduling or resource waste for complex, distributed workloads. Kubernetes v1.36 introduces a comprehensive suite of Workload Aware Scheduling (WAS) features in Alpha, natively integrating the Job controller with a new Workload API and a decoupled PodGroup API to treat related pods as a single logical entity.
 
-Now, the scheduler can perform Gang Scheduling by ensuring a minimum number of pods are ready before any are bound, while new Topology-Aware and Preemption policies optimize placement within specific network or rack domains. This evolution significantly reduces the need for third-party schedulers in AI/ML and batch processing, allowing users to guarantee the tight physical co-location and atomic resource acquisition required for high-performance distributed training.
+As of v1.35, the scheduler could perform Gang Scheduling by ensuring a minimum number of pods are ready before any are bound, while the new work in gang scheduling in v1.36 includes a new PodGroup scheduling cycle, which atomically evaluates the entire pod group.
 
 This work was done across several KEPs (including [#4671](https://github.com/kubernetes/enhancements/issues/4671), [#5547](https://github.com/kubernetes/enhancements/issues/5547), [#5832](https://github.com/kubernetes/enhancements/issues/5832), [#5732](https://github.com/kubernetes/enhancements/issues/5732), and [#5710](https://github.com/kubernetes/enhancements/issues/5710)) led by SIG Scheduling and SIG Apps.
 
