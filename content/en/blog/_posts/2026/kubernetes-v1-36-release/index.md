@@ -170,7 +170,7 @@ In Kubernetes v1.36, the `StrictIPCIDRValidation` feature for API IP and CIDR fi
 
 Controllers are updated to canonicalize IPs they write back into objects and to warn when they encounter bad values that were already stored, so clusters can gradually converge on clean, consistent data. With beta, `StrictIPCIDRValidation` is ready for wider use, giving operators more reliable guardrails around IP-related configuration as they evolve networks and policies over time.
 
-This work was done as a part of [KEP #4858](https://github.com/kubernetes/enhancements/issues/4858) led by SIG Network
+This work was done as a part of [KEP #4858](https://kep.k8s.io/4858) led by SIG Network
 
 ### Separate kubectl user preferences from cluster configs
 
@@ -178,7 +178,7 @@ In Kubernetes v1.36, the `.kuberc` feature for customizing `kubectl` user prefer
 
 Using the `kubectl.config.k8s.io/v1beta1` schema, teams can define aliases, set default options, and establish policies for credential plugins (including allowlists) to enforce safer authentication practices. Users can disable this functionality if needed by setting the `KUBECTL_KUBERC=false` or `KUBERC=off` environment variables.
 
-This work was done as a part of [KEP #3104](https://github.com/kubernetes/enhancements/issues/3104) led by SIG Auth
+This work was done as a part of [KEP #3104](https://kep.k8s.io/3104) led by SIG Auth
 
 ### Mutable Container Resources when Job is suspended
 
