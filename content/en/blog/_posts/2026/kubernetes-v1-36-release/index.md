@@ -44,11 +44,13 @@ Previously, Kubernetes lacked a native way to report the health of allocated dev
 Now, users can use `kubectl describe pod` to determine if a container's crash loop is due to an `Unhealthy` or `Unknown` device status, regardless of whether the hardware was provisioned via traditional plugins or the newer DRA framework. This enhanced visibility allows administrators and automated controllers to quickly identify faulty hardware and streamline the recovery of high-performance workloads.
 This work was done as part of [KEP #4680](https://github.com/kubernetes/enhancements/issues/4680) led by SIG Node.
 
-### Alpha: Staleness mitigation for controllers
+### Alpha: Workload Aware Scheduling (WAS) features
 
-Staleness in Kubernetes controllers is a problem that affects many controllers and can subtly affect controller behavior. It is usually not until it is too late, when a controller in production has already taken incorrect action, that staleness is found to be an issue due to some underlying assumption made by the controller author. Some issues caused by staleness include controllers taking incorrect actions, not taking action when they should, and taking too long to act. We are excited to announce that Kubernetes v1.36 includes new features that help mitigate controller staleness and provide better observability of controller behavior.
+Previously, the Kubernetes scheduler and job controllers managed pods as independent units, often leading to fragmented scheduling or resource waste for complex, distributed workloads. Kubernetes v1.36 introduces a comprehensive suite of Workload Aware Scheduling (WAS) features in Alpha, natively integrating the Job controller with a new Workload API and a decoupled PodGroup API to treat related pods as a single logical entity.
 
-This work was done as part of [KEP #5647](https://github.com/kubernetes/enhancements/issues/5647) led by SIG API Machinery.
+Now, the scheduler can perform Gang Scheduling by ensuring a minimum number of pods are ready before any are bound, while new Topology-Aware and Preemption policies optimize placement within specific network or rack domains. This evolution significantly reduces the need for third-party schedulers in AI/ML and batch processing, allowing users to guarantee the tight physical co-location and atomic resource acquisition required for high-performance distributed training.
+
+This work was done across several KEPs (including [#4671](https://github.com/kubernetes/enhancements/issues/4671), [#5547](https://github.com/kubernetes/enhancements/issues/5547), [#5832](https://github.com/kubernetes/enhancements/issues/5832), [#5732](https://github.com/kubernetes/enhancements/issues/5732), and [#5710](https://github.com/kubernetes/enhancements/issues/5710)) led by SIG Scheduling and SIG Apps.
 
 ## Features graduating to Stable
 
