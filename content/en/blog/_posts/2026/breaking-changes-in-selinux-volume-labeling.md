@@ -9,7 +9,7 @@ author: >
   [Swathi Rao](https://github.com/SwathiR03) (independent)
 ---
 
-If you run Kubernetes on Linux with SELinux in enforcing mode, plan ahead: a future release(anticipated to be v1.37) is
+If you run Kubernetes on Linux with SELinux in enforcing mode, plan ahead: a future release (anticipated to be v1.37) is
 expected to turn the `SELinuxMount` [feature gate](/docs/reference/command-line-tools-reference/feature-gates/) on by default. This makes volume setup faster
 for most workloads, but **it can break applications** that still depend on the older recursive relabeling
 model in subtle ways (for example, sharing one volume between privileged and unprivileged Pods on the same node).
