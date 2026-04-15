@@ -66,15 +66,15 @@ This work was done as part of [KEP #3476](https://kep.k8s.io/3476) led by SIG St
 
 Security for storage integrations reaches a higher standard in Kubernetes v1.36 with the graduation of CSI Service Account Token Secret Redaction to Stable. This improvement eliminates a long-standing security risk where sensitive service account tokens, intended only for the storage driver, were inadvertently exposed within the Secret field of CSI volume objects, making them visible to unauthorized users with basic read access to the API.
 
-Now, Kubernetes automatically ensures that these short-lived tokens are handled through dedicated, secure channels rather than being bundled into persistent secrets. This change hardens the security posture of clusters by enforcing the principle of least privilege, preventing token leakage and ensuring that workload identities remain protected throughout the entire storage lifecycle.
+Kubernetes now allows CSI drivers to opt in to receive these short-lived tokens through the dedicated `secrets` field. Driver authors can enable this behavior by updating the `CSIDriver` object. This approach prevents token leakage in driver logs and protects workload identities.
 
 This work was done as part of [KEP #5538](https://github.com/kubernetes/enhancements/issues/5538) led by SIG Storage.
 
 ### Mutable CSINode Allocatable Property
 
-The management of node storage capacity becomes significantly more dynamic in Kubernetes v1.36 with the graduation of Mutable CSINode Allocatable to Stable. This update moves away from the historical limitation where the storage resource limits for a node, such as the maximum number of volumes a node can handle, were static and only set during the initial registration of the CSI driver.
+In Kubernetes v1.36, the Mutable `CSINode` Allocatable feature graduates to stable. This enhancement resolves a limitation where node storage resource limits, such as the maximum number of volumes a node can attach, were static and set only during the initial registration of the Container Storage Interface (CSI) driver.
 
-Now, CSI drivers can update their volume limits and capacity information on the fly without requiring a restart of the driver or the kubelet. This flexibility is essential for modern cloud environments where node resources can change dynamically, ensuring that the Kubernetes scheduler always has an accurate view of storage availability and preventing pod scheduling failures caused by outdated volume limits.
+With this update, the `kubelet` can dynamically update a node's volume limits and capacity information. The `kubelet` adjusts these limits based on periodic checks or in response to resource exhaustion errors from the CSI driver, without requiring a component restart. This ensures the Kubernetes scheduler maintains an accurate view of storage availability, preventing pod scheduling failures caused by outdated volume limits.
 
 This work was done as part of [KEP #4876](https://github.com/kubernetes/enhancements/issues/4876) led by SIG Storage.
 
@@ -116,7 +116,7 @@ This work was done as part of [KEP #3962](https://github.com/kubernetes/enhancem
 
 The development of custom resources reaches a new level of efficiency in Kubernetes v1.36 as Declarative Validation with validation-gen graduates to Stable. This milestone replaces the manual and often error-prone task of writing complex OpenAPI schemas by allowing developers to define sophisticated validation logic directly within Go struct tags using the Common Expression Language (CEL).
 
-Now, developers can rely on a fully stabilized toolset to automatically generate robust API validation rules at compile-time, ensuring that Custom Resource Definitions (CRDs) remain perfectly synchronized with their source code. By baking validation directly into the development workflow, this enhancement eliminates configuration drift and guarantees that high-quality, self-validating APIs are delivered with long-term compatibility and reduced maintenance overhead.
+Instead of writing custom validation functions, Kubernetes contributors can now define validation rules using IDL marker comments (such as `+k8s:minimum` or `+k8s:enum`) directly within the API type definitions (`types.go`). The `validation-gen` tool parses these comments to automatically generate robust API validation code at compile-time. This reduces maintenance overhead and ensures that API validation remains consistent and synchronized with the source code.
 
 This work was done as part of [KEP #5073](https://github.com/kubernetes/enhancements/issues/5073) led by SIG API Machinery.
 
@@ -124,7 +124,7 @@ This work was done as part of [KEP #5073](https://github.com/kubernetes/enhancem
 
 Security and long-term maintainability for the Kubernetes codebase take a major step forward in Kubernetes v1.36 with the graduation of the Gogo Protobuf Removal to Stable. This initiative eliminates a significant dependency on the unmaintained `gogoprotobuf` library, which had become a source of potential security vulnerabilities and a blocker for adopting modern Go language features.
 
-Now, the project has successfully transitioned to the official `google.golang.org/protobuf` and `protoc-gen-go` toolchains, ensuring that core Kubernetes components are built on a modern, actively supported foundation. While this change is largely internal to the codebase, it guarantees a more secure and stable ecosystem for all users by removing technical debt and enabling the project to leverage the latest performance optimizations and security patches in the Go ecosystem.
+Instead of migrating to standard protobuf generation, which presented compatibility risks for Kubernetes API types, the project opted to fork and internalize the required generation logic within `k8s.io/code-generator`. This approach successfully eliminates the unmaintained runtime dependencies from the Kubernetes dependency graph while preserving existing API behavior and serialization compatibility. For consumers of Kubernetes API Go types, this change reduces technical debt and prevents accidental misuse with standard protobuf libraries.
 
 This work was done as part of [KEP #5589](https://github.com/kubernetes/enhancements/issues/5589) led by SIG API Machinery.
 
@@ -148,7 +148,7 @@ This work was done as part of [KEP #127](https://github.com/kubernetes/enhanceme
 
 Node resource management and observability become more precise in Kubernetes v1.36 as the export of Pressure Stall Information (PSI) metrics graduates to Stable. This feature provides the kubelet with the ability to report "pressure" metrics for CPU, memory, and I/O, offering a more granular view of resource contention than traditional utilization metrics.
 
-Now, cluster operators and autoscalers can distinguish between a system that is simply busy and one that is actively stalling due to resource exhaustion. By leveraging these high-fidelity signals, users can more accurately tune pod resource requests, improve the reliability of vertical autoscaling, and detect "noisy neighbor" effects before they lead to application performance degradation or node instability.
+Cluster operators and autoscalers can use these metrics to distinguish between a system that is simply busy and one that is actively stalling due to resource exhaustion. By leveraging these signals, users can more accurately tune pod resource requests, improve the reliability of vertical autoscaling, and detect noisy neighbor effects before they lead to application performance degradation or node instability.
 
 This work was done as part of [KEP #4205](https://github.com/kubernetes/enhancements/issues/4205) led by SIG Node.
 
@@ -174,9 +174,9 @@ This work was done as a part of [KEP #4858](https://github.com/kubernetes/enhanc
 
 ### Separate kubectl user preferences from cluster configs
 
-In Kubernetes v1.36, the `.kuberc` feature for kubectl user preferences continues to mature, building on its earlier alpha and beta releases to make client‑side customization first‑class. With `~/.kube/kuberc`, you can keep aliases, default flags, color and output tweaks, and other personal settings separate from kubeconfig files that hold cluster endpoints and credentials. This separation helps avoid breaking CI pipelines or shared kubeconfigs with someone’s local preferences, while still letting users carry a consistent kubectl experience across all clusters and contexts. 
+In Kubernetes v1.36, the `.kuberc` feature for customizing `kubectl` user preferences graduates to beta and is enabled by default. The `~/.kube/kuberc` file allows users to store aliases, default flags, and other personal settings separately from `kubeconfig` files, which hold cluster endpoints and credentials. This separation prevents personal preferences from interfering with CI pipelines or shared `kubeconfig` files, while maintaining a consistent `kubectl` experience across different clusters and contexts.
 
-The schema, `kubectl.config.k8s.io/v1beta1`, supports defining aliases, default options, and credential plugin policies (including allowlists), so teams can also codify safer authentication practices for kubectl. With this release, kuberc is documented, covered by tests, and enabled via feature gate and environment variable controls, making it ready for wider adoption in both developer laptops and automated environments.
+Using the `kubectl.config.k8s.io/v1beta1` schema, teams can define aliases, set default options, and establish policies for credential plugins (including allowlists) to enforce safer authentication practices. Users can disable this functionality if needed by setting the `KUBECTL_KUBERC=false` or `KUBERC=off` environment variables.
 
 This work was done as a part of [KEP #3104](https://github.com/kubernetes/enhancements/issues/3104) led by SIG Auth
 
@@ -184,7 +184,7 @@ This work was done as a part of [KEP #3104](https://github.com/kubernetes/enhanc
 
 In Kubernetes v1.36, the MutablePodResourcesForSuspendedJobs feature for Jobs graduates to beta, relaxing validation so you can update container CPU, memory, GPU, and extended resource requests and limits while a Job is suspended. This gives queue controllers and operators a safe hook to right‑size batch workloads based on real‑time cluster conditions, rather than locking in resource guesses made at submit time. For example, a queueing system can suspend incoming Jobs, adjust their resource requirements to match available capacity or quota, then unsuspend them once the cluster can actually run them. 
 
-The feature carefully scopes mutability to suspended Jobs (and Jobs whose pods have been terminated on suspension), avoiding disruptive changes to actively running pods while still enabling workflows like “checkpoint, suspend, resize, resume.” With beta, the feature is enabled by default behind two feature gates, covered by unit, integration, and (for beta) e2e tests, and is already in use by higher‑level controllers such as Kueue and JobSet for more efficient GPU and batch scheduling.
+By eliminating the need to delete and recreate Jobs to change resource requirements, this feature improves integration with higher-level controllers like Kueue and JobSet for more efficient batch scheduling.
 
 This work was done as a part of [KEP #5440](https://github.com/kubernetes/enhancements/issues/5440) led by SIG Apps.
 
@@ -196,9 +196,9 @@ This work was done as a part of [KEP #5284](https://github.com/kubernetes/enhanc
 
 ### DRA features in beta
 
-The Dynamic Resource Allocation (DRA) framework reaches another maturity milestone in Kubernetes v1.36 as several core features graduate to Beta and are enabled by default. This transition moves DRA beyond basic allocation by graduating Partitionable Devices and Consumable Capacity, allowing for more granular sharing of hardware like GPUs, while Device Taints and Tolerations ensure that specialized resources are only utilized by the appropriate workloads.
+The [Dynamic Resource Allocation (DRA)](/docs/concepts/scheduling-eviction/dynamic-resource-allocation/) framework reaches another maturity milestone in Kubernetes v1.36 as several core features graduate to beta and are enabled by default. This transition moves DRA beyond basic allocation by graduating [partitionable devices](/docs/concepts/scheduling-eviction/dynamic-resource-allocation/#partitionable-devices) and [consumable capacity](/docs/concepts/scheduling-eviction/dynamic-resource-allocation/#consumable-capacity), allowing for more granular sharing of hardware like GPUs, while [device taints and tolerations](/docs/concepts/scheduling-eviction/dynamic-resource-allocation/#device-taints-and-tolerations) ensure that specialized resources are only utilized by the appropriate workloads.
 
-Now, users benefit from a much more reliable and observable resource lifecycle through Resource Claim Device Status  and the ability to ensure Device Attachment before Pod Scheduling. By integrating these features with Extended Resource support, Kubernetes provides a robust production-ready alternative to the legacy device plugin system, enabling complex AI and HPC workloads to manage hardware with unprecedented precision and operational safety.
+Now, users benefit from a much more reliable and observable resource lifecycle through [ResourceClaim device status]/docs/concepts/scheduling-eviction/dynamic-resource-allocation/#resourceclaim-device-status) and the ability to ensure device attachment before Pod scheduling. By integrating these features with [extended resource](/docs/concepts/scheduling-eviction/dynamic-resource-allocation/#extended-resource) support, Kubernetes provides a robust production-ready alternative to the legacy device plugin system, enabling complex AI and HPC workloads to manage hardware with unprecedented precision and operational safety.
 
 This work was done across several KEPs (including [#5004](https://github.com/kubernetes/enhancements/issues/5004), [#4817](https://github.com/kubernetes/enhancements/issues/4817), [#5055](https://github.com/kubernetes/enhancements/issues/5055), [#5075](https://github.com/kubernetes/enhancements/issues/5075), [#4815](https://github.com/kubernetes/enhancements/issues/5075), and [#5007](https://github.com/kubernetes/enhancements/issues/5007)) led by SIG Scheduling and SIG Node.
 
@@ -288,7 +288,7 @@ This work was done as part of [KEP #5647](https://kep.k8s.io/5647) led by SIG AP
 
 ### CRI List Streaming
 
-Cluster performance and scalability receive a significant boost in Kubernetes v1.36 with the introduction of CRI List Streaming in Alpha. This enhancement addresses the memory pressure and latency spikes often seen on large-scale nodes by replacing traditional, monolithic "List" requests between the kubelet and the container runtime with a more efficient server-side streaming RPC.
+With the introduction of CRI List Streaming in Alpha, Kubernetes v1.36 will have additional server-side streaming operations. This enhancement addresses the memory pressure and latency spikes often seen on large-scale nodes by replacing traditional, monolithic "List" requests between the kubelet and the container runtime with a more efficient server-side streaming RPC.
 
 Now, instead of waiting for a single, massive response containing all container or image data, the kubelet can process results incrementally as they are streamed. This shift significantly reduces the peak memory footprint of the kubelet and improves responsiveness on high-density nodes, ensuring that cluster management remains fluid even as the number of containers per node continues to grow.
 
