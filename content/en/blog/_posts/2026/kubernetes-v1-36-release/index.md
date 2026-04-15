@@ -42,7 +42,7 @@ The `KubeletFineGrainedAuthz` feature gate was introduced as an opt-in alpha fea
 Previously, Kubernetes lacked a native way to report the health of allocated devices, making it difficult to diagnose Pod crashes caused by hardware failures. Building on the initial alpha release in v1.31 which focused on Device Plugins, Kubernetes v1.36 expands this feature to support Dynamic Resource Allocation (DRA), introducing the `allocatedResourcesStatus` field to provide a unified health reporting mechanism for all specialized hardware.
 
 Now, users can use `kubectl describe pod` to determine if a container's crash loop is due to an `Unhealthy` or `Unknown` device status, regardless of whether the hardware was provisioned via traditional plugins or the newer DRA framework. This enhanced visibility allows administrators and automated controllers to quickly identify faulty hardware and streamline the recovery of high-performance workloads.
-This work was done as part of [KEP #4680](https://github.com/kubernetes/enhancements/issues/4680) led by SIG Node.
+This work was done as part of [KEP #4680](https://kep.k8s.io/4680) led by SIG Node.
 
 ### Alpha: Workload Aware Scheduling (WAS) features
 
@@ -58,9 +58,9 @@ This is a selection of some of the improvements that are now stable following th
 
 ### Volume Group Snapshots
 
-After several cycles in beta, Volume Group Snapshots reach General Availability (GA) in Kubernetes v1.36. This feature allows you to take crash-consistent snapshots across multiple PersistentVolumeClaims simultaneously. By ensuring that data and logs across different volumes remain synchronized, this enhancement provides a robust solution for protecting complex, multi-volume workloads. With this release, the API version promotes to v1 and the CSIVolumeGroupSnapshot feature gate is now locked to enabled.
+After several cycles in beta, Volume Group Snapshots reach General Availability (GA) in Kubernetes v1.36. This feature allows you to take crash-consistent snapshots across multiple PersistentVolumeClaims simultaneously. By ensuring that data and logs across different volumes remain synchronized, this enhancement provides a robust solution for protecting complex, multi-volume workloads. With this release, the API version promotes to v1 and the `CSIVolumeGroupSnapshot` feature gate is now locked to enabled.
 
-This work was done as part of [KEP #3476](https://github.com/kubernetes/enhancements/issues/3476) led by SIG Storage.
+This work was done as part of [KEP #3476](https://kep.k8s.io/3476) led by SIG Storage.
 
 ### CSI driver opt-in for service account tokens via secrets field
 
