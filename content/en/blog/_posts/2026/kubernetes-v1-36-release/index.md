@@ -340,7 +340,7 @@ this feature improves integration with higher-level controllers like Kueue and J
 
 This work was done as a part of [KEP #5440](https://kep.k8s.io/5440) led by SIG Apps.
 
-### Constrained Impersonation
+### Constrained impersonation
 
 In Kubernetes v1.36, the `ConstrainedImpersonation` feature for user impersonation graduates to beta, 
 tightening a historically all‑or‑nothing mechanism into something that can actually follow least‑privilege principles. 
