@@ -304,6 +304,19 @@ Ingress NGINX will continue to function, and installation artifacts like Helm ch
 
 For full details, see the [official retirement announcement](/blog/2025/11/11/ingress-nginx-retirement/).
 
+### Faster SELinux labelling for volumes (GA) {#volume-selinux-labelling}
+
+Kubernetes v1.36 makes the SELinux volume mounting improvement generally available. This change replaced recursive file relabeling with `mount -o context=XYZ` option, applying the correct SELinux label to the entire volume at mount time. It brings more consistent performance and reduces Pod startup delays on SELinux-enforcing systems.
+
+This feature was introduced as beta in v1.28 for `ReadWriteOncePod` volumes. In v1.32, it gained metrics and an opt-out option
+(`securityContext.seLinuxChangePolicy: Recursive`) to help catch conflicts. Now in v1.36, it reaches stable and defaults to all volumes, with Pods or CSIDrivers opting in via `spec.SELinuxMount`. 
+
+However, we expect this feature to create the risk of breaking changes in the future Kubernetes releases, due to the potential for mixing of privileged and unprivileged pods.
+
+Setting the `seLinuxChangePolicy` field and SELinux volume labels on Pods, correctly, is the responsibility of the Pod author Developers have that responsibility whether they are writing a Deployment, StatefulSet, DaemonSet or even a custom resource that includes a Pod template. Being careless with these settings can lead to a range of problems when Pods share volumes.
+
+For more details on this enhancement, refer to  [KEP-1710: Speed up recursive SELinux label change](https://kep.k8s.io/1710)
+
 ## Graduations, deprecations, and removals in v1.36
 
 ### Graduations to stable
