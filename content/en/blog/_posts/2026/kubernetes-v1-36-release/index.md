@@ -241,7 +241,7 @@ As this feature reaches GA in Kubernetes 1.36 after thorough performance validat
 it is enabled by default on the kubelet through the `NodeLogQuery` feature gate. 
 In addition, the `enableSystemLogQuery` kubelet configuration option must also be enabled. 
 
-This work was done as a part of [KEP #2258](http://kep.k8s.io/2258) led by SIG Windows.
+This work was done as a part of [KEP #2258](https://kep.k8s.io/2258) led by SIG Windows.
 
 ### Support User Namespaces in pods
 
