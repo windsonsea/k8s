@@ -565,7 +565,7 @@ This release includes a total of 18 enhancements promoted to stable:
 - [Speed up recursive SELinux label change](https://kep.k8s.io/1710)
 - [Portworx file in-tree to CSI driver migration](https://kep.k8s.io/2589)
 - [Fine grained Kubelet API authorization](https://kep.k8s.io/2862)
-- [Mutating Admission Policies](https://gkep.k8s.io/3962)
+- [Mutating Admission Policies](https://kep.k8s.io/3962)
 - [Node log query](https://kep.k8s.io/2258)
 - [VolumeGroupSnapshot](https://kep.k8s.io/3476)
 - [Mutable CSINode Allocatable Property](https://kep.k8s.io/4876)
