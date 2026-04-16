@@ -182,7 +182,7 @@ This work was done as a part of [KEP #3104](https://kep.k8s.io/3104) led by SIG 
 
 ### Mutable Container Resources when Job is suspended
 
-In Kubernetes v1.36, the MutablePodResourcesForSuspendedJobs feature for Jobs graduates to beta, relaxing validation so you can update container CPU, memory, GPU, and extended resource requests and limits while a Job is suspended. This gives queue controllers and operators a safe hook to right‑size batch workloads based on real‑time cluster conditions, rather than locking in resource guesses made at submit time. For example, a queueing system can suspend incoming Jobs, adjust their resource requirements to match available capacity or quota, then unsuspend them once the cluster can actually run them. 
+In Kubernetes v1.36, the MutablePodResourcesForSuspendedJobs feature for Jobs graduates to beta, relaxing validation to allow updates to container CPU, memory, GPU, and extended resource requests and limits whil a Job is suspended. This gives queue controllers and operators a safe hook to right‑size batch workloads based on real‑time cluster conditions, rather than locking in resource guesses made at submit time. For example, a queueing system can suspend incoming Jobs, adjust their resource requirements to match available capacity or quota, then unsuspend them once the cluster can actually run them. 
 
 By eliminating the need to delete and recreate Jobs to change resource requirements, this feature improves integration with higher-level controllers like Kueue and JobSet for more efficient batch scheduling.
 
@@ -242,9 +242,11 @@ This is a selection of some of the improvements that are now alpha following the
 
 ### Staleness mitigation for controllers
 
-Staleness in Kubernetes controllers is a problem that affects many controllers and can subtly affect controller behavior. It is usually not until it is too late, when a controller in production has already taken incorrect action, that staleness is found to be an issue due to some underlying assumption made by the controller author. Some issues caused by staleness include controllers taking incorrect actions, not taking action when they should, and taking too long to act. We are excited to announce that Kubernetes v1.36 includes new features that help mitigate controller staleness and provide better observability of controller behavior.
+Staleness in Kubernetes controllers is a problem that affects many controllers and can subtly affect controller behavior. It is usually not until it is too late, when a controller in production has already taken incorrect action, that staleness is found to be an issue due to some underlying assumption made by the controller author. This could lead to conflicting updates or data corruption when a new instance of the same controller took over.
 
-This work was done as part of [KEP #5647](https://github.com/kubernetes/enhancements/issues/5647) led by SIG API Machinery.
+We are excited to announce that Kubernetes v1.36 includes new features that help mitigate controller staleness and provide better observability of controller behavior. The kube-apiserver can now leverage the ControllerTerm in the Lease object to verify that a controller is the current valid leader before committing changes. This ensures that only the active, authoritative controller can modify resources, providing higher reliability for mission-critical automation and preventing the race conditions that commonly plague distributed control loops during failover events.
+
+This work was done as part of [KEP #5647](https://kep.k8s.io/5647) led by SIG API Machinery.
 
 ### HPA Scale to Zero for Custom Metrics
 
@@ -277,14 +279,6 @@ Managing admission controllers moves toward a more declarative and consistent mo
 Now, cluster operators can manage admission plugin settings with the same versioned, declarative workflows used for other Kubernetes objects, significantly reducing the risk of configuration drift and manual errors during cluster upgrades. By centralizing these configurations into a unified manifest, the kube-apiserver becomes easier to audit and automate, paving the way for more secure and reproducible cluster deployments.
 
 This work was done as part of [KEP #5793](https://kep.k8s.io/5793) led by SIG API Machinery.
-
-### Stale Controller Mitigation
-
-Kubernetes v1.36 introduces a more robust mechanism for Stale Controller Handling in Alpha, addressing the risks posed by "zombie" controllers that continue to act on outdated information after a network partition or a crash. In the past, the lack of a standardized way to detect and block requests from stale controller instances could lead to conflicting updates or data corruption when a new instance of the same controller took over.
-
-Now, the kube-apiserver can leverage the ControllerTerm in the Lease object to verify that a controller is the current valid leader before committing changes. This ensures that only the active, authoritative controller can modify resources, providing higher reliability for mission-critical automation and preventing the race conditions that commonly plague distributed control loops during failover events.
-
-This work was done as part of [KEP #5647](https://kep.k8s.io/5647) led by SIG API Machinery.
 
 ### CRI List Streaming
 
