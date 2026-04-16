@@ -616,7 +616,7 @@ Check out the full details of the Kubernetes v1.36 release in our [release notes
 
 ## Availability
 
-Kubernetes v1.36 is available for download on [GitHub](https://github.com/kubernetes/kubernetes/releases/tag/v1.36.0) or on the [Kubernetes download page](http://releases/download/).
+Kubernetes v1.36 is available for download on [GitHub](https://github.com/kubernetes/kubernetes/releases/tag/v1.36.0) or on the [Kubernetes download page](https://kubernetes.io/releases/download/).
 
 To get started with Kubernetes, check out these interactive tutorials or run local Kubernetes clusters using [minikube](https://minikube.sigs.k8s.io/). 
 You can also easily install v1.34 using kubeadm.
