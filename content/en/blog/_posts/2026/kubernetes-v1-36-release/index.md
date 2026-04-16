@@ -136,7 +136,7 @@ With these features stable, clusters running with SELinux enabled get a more pre
 performant startup path while setting the stage for stricter, 
 safer SELinux enforcement in Kubernetes 1.37 and beyond.
 
-This work was done as a part of [KEP #1710](http://kep.k8s.io/1710) led by SIG Node and SIG Storage. 
+This work was done as a part of [KEP #1710](https://kep.k8s.io/1710) led by SIG Node and SIG Storage. 
 
 ### API for external signing of Service Account tokens
 
