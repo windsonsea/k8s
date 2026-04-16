@@ -702,7 +702,8 @@ and through the channels below. Thank you for your continued feedback and suppor
 - Follow us on Bluesky [@Kubernetesio](https://bsky.app/profile/kubernetes.io) for the latest updates
 - Join the community discussion on [Discuss](https://discuss.kubernetes.io/)
 - Join the community on [Slack](http://slack.k8s.io/)
-- Post questions (or answer questions) on [Stack Overflow](http://stackoverflow.com/questions/tagged/kubernetes)
+- Join the community on [Slack](https://slack.k8s.io/)
+- Post questions (or answer questions) on [Stack Overflow](https://stackoverflow.com/questions/tagged/kubernetes)
 - Share your Kubernetes [story](https://docs.google.com/a/linuxfoundation.org/forms/d/e/1FAIpQLScuI7Ye3VQHQTwBASrgkjQDSS5TP0g3AXfFhwSM9YpHgxRKFA/viewform)
 - Read more about what’s happening with Kubernetes on the [blog](https://kubernetes.io/blog/)
 - Learn more about the [Kubernetes Release Team](https://github.com/kubernetes/sig-release/tree/master/release-team)
