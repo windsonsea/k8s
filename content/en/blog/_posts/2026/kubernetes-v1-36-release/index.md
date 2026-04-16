@@ -73,7 +73,7 @@ a minimum number of pods are ready before any are bound,
 while the new work in gang scheduling in v1.36 includes a new 
 PodGroup scheduling cycle, which atomically evaluates the entire pod group.
 
-This work was done across several KEPs (including [#4671](https://github.com/kubernetes/enhancements/issues/4671), [#5547](https://github.com/kubernetes/enhancements/issues/5547), [#5832](https://github.com/kubernetes/enhancements/issues/5832), [#5732](https://github.com/kubernetes/enhancements/issues/5732), and [#5710](https://github.com/kubernetes/enhancements/issues/5710)) led by SIG Scheduling and SIG Apps.
+This work was done across several KEPs (including [#4671](https://kep.k8s.io/4671), [#5547](https://kep.k8s.io/5547), [#5832](https://kep.k8s.io/5832), [#5732](https://kep.k8s.io/5732), and [#5710](https://kep.k8s.io/5710)) led by SIG Scheduling and SIG Apps.
 
 ## Features graduating to Stable
 
@@ -104,7 +104,7 @@ Kubernetes now allows CSI drivers to opt in to receive these short-lived tokens 
 the dedicated `secrets` field. Driver authors can enable this behavior by updating the 
 `CSIDriver` object. This approach prevents token leakage in driver logs and protects workload identities.
 
-This work was done as part of [KEP #5538](https://github.com/kubernetes/enhancements/issues/5538) led by SIG Storage.
+This work was done as part of [KEP #5538](https://kep.k8s.io/5538) led by SIG Storage.
 
 ### Mutable CSINode Allocatable Property
 
@@ -119,7 +119,7 @@ resource exhaustion errors from the CSI driver, without requiring a component re
 This ensures the Kubernetes scheduler maintains an accurate view of storage availability, 
 preventing pod scheduling failures caused by outdated volume limits.
 
-This work was done as part of [KEP #4876](https://github.com/kubernetes/enhancements/issues/4876) led by SIG Storage.
+This work was done as part of [KEP #4876](https://kep.k8s.io/4876) led by SIG Storage.
 
 ### Speed up recursive SELinux label change
 
@@ -157,7 +157,7 @@ With GA in v1.36, `ExternalServiceAccountTokenSigner` is now a fully supported o
 centralize identity and signing, simplifying integration with external IAM systems and 
 reducing the need to manage signing keys directly inside the control plane.
 
-This work was done as part of [KEP #740](https://github.com/kubernetes/enhancements/issues/740) led by SIG Auth
+This work was done as part of [KEP #740](https://kep.k8s.io/740) led by SIG Auth
 
 ### DRA features graduating to Stable
 
@@ -173,7 +173,7 @@ sophisticated resource-sharing policies and administrative overrides that are es
 large-scale GPU clusters and multi-tenant AI platforms, marking the completion of the 
 core architectural foundation for next-generation resource management.
 
-This work was done as part of KEPs [#5018](https://github.com/kubernetes/enhancements/issues/5018) and [#4816](https://github.com/kubernetes/enhancements/issues/4816) led by SIG Auth and SIG Scheduling.
+This work was done as part of KEPs [#5018](https://kep.k8s.io/5018) and [#4816](https://kep.k8s.io/4816) led by SIG Auth and SIG Scheduling.
 
 ### Mutating Admission Policies
 
@@ -189,7 +189,7 @@ By moving mutation logic into a declarative, versioned policy, organizations can
 more predictable cluster behavior, reduced network overhead, 
 and a hardened security model with the full guarantee of long-term API stability.
 
-This work was done as part of [KEP #3962](https://github.com/kubernetes/enhancements/issues/3962) led by SIG API Machinery.
+This work was done as part of [KEP #3962](https://kep.k8s.io/3962) led by SIG API Machinery.
 
 ### Declarative Validation Of Kubernetes Native Types With validation-gen
 
@@ -206,7 +206,7 @@ comments to automatically generate robust API validation code at compile-time.
 This reduces maintenance overhead and ensures that API validation 
 remains consistent and synchronized with the source code.
 
-This work was done as part of [KEP #5073](https://github.com/kubernetes/enhancements/issues/5073) led by SIG API Machinery.
+This work was done as part of [KEP #5073](https://kep.k8s.io/5073) led by SIG API Machinery.
 
 ### Remove gogo protobuf dependency for Kubernetes API types
 
@@ -224,7 +224,7 @@ while preserving existing API behavior and serialization compatibility.
 For consumers of Kubernetes API Go types, this change reduces technical debt and 
 prevents accidental misuse with standard protobuf libraries.
 
-This work was done as part of [KEP #5589](https://github.com/kubernetes/enhancements/issues/5589) led by SIG API Machinery.
+This work was done as part of [KEP #5589](https://kep.k8s.io/5589) led by SIG API Machinery.
 
 ### Node log query
 
@@ -259,7 +259,7 @@ Kubernetes provides a robust, standardized mechanism to protect multi-tenant
 environments and sensitive infrastructure from unauthorized access, 
 all with the full guarantee of long-term API stability.
 
-This work was done as part of [KEP #127](https://github.com/kubernetes/enhancements/issues/127) led by SIG Node.
+This work was done as part of [KEP #127](https://kep.k8s.io/127) led by SIG Node.
 
 ### Support PSI based on cgroupv2
 
@@ -275,7 +275,7 @@ By leveraging these signals, users can more accurately tune pod resource request
 improve the reliability of vertical autoscaling, and detect noisy neighbor 
 effects before they lead to application performance degradation or node instability.
 
-This work was done as part of [KEP #4205](https://github.com/kubernetes/enhancements/issues/4205) led by SIG Node.
+This work was done as part of [KEP #4205](https://kep.k8s.io/4205) led by SIG Node.
 
 ### VolumeSource: OCI Artifact and/or Image
 
@@ -290,7 +290,7 @@ This convergence of image and volume management simplifies CI/CD pipelines,
 reduces dependency on specialized storage backends for read-only content, 
 and ensures that data remains portable and securely accessible across any environment.
 
-This work was done as part of [KEP #4639](https://github.com/kubernetes/enhancements/issues/4639) led by SIG Node.
+This work was done as part of [KEP #4639](https://kep.k8s.io/4639) led by SIG Node.
 
 ## New features in Beta
 
@@ -326,7 +326,7 @@ Users can disable this functionality if needed by setting the `KUBECTL_KUBERC=fa
 
 This work was done as a part of [KEP #3104](https://kep.k8s.io/3104) led by SIG CLI, with the help from SIG Auth.
 
-### Mutable Container Resources when Job is suspended
+### Mutable Container resources when Job is suspended
 
 In Kubernetes v1.36, the MutablePodResourcesForSuspendedJobs feature for Jobs graduates to beta, 
 relaxing validation to allow updates to container CPU, memory, GPU, and extended resource requests 
@@ -338,7 +338,7 @@ available capacity or quota, then unsuspend them once the cluster can actually r
 By eliminating the need to delete and recreate Jobs to change resource requirements, 
 this feature improves integration with higher-level controllers like Kueue and JobSet for more efficient batch scheduling.
 
-This work was done as a part of [KEP #5440](https://github.com/kubernetes/enhancements/issues/5440) led by SIG Apps.
+This work was done as a part of [KEP #5440](https://kep.k8s.io/5440) led by SIG Apps.
 
 ### Constrained Impersonation
 
@@ -353,7 +353,7 @@ making the transition incremental instead of a flag day. With beta in v1.36, `Co
 documented, and ready for wider adoption by platform teams that rely on impersonation for debugging, proxying, 
 or node‑level controllers.
 
-This work was done as a part of [KEP #5284](https://github.com/kubernetes/enhancements/issues/5284) led by SIG Auth
+This work was done as a part of [KEP #5284](https://kep.k8s.io/5284) led by SIG Auth
 
 ### DRA features in beta
 
@@ -367,7 +367,7 @@ By integrating these features with [extended resource](/docs/concepts/scheduling
 Kubernetes provides a robust production-ready alternative to the legacy device plugin system, 
 enabling complex AI and HPC workloads to manage hardware with unprecedented precision and operational safety.
 
-This work was done across several KEPs (including [#5004](https://github.com/kubernetes/enhancements/issues/5004), [#4817](https://github.com/kubernetes/enhancements/issues/4817), [#5055](https://github.com/kubernetes/enhancements/issues/5055), [#5075](https://github.com/kubernetes/enhancements/issues/5075), [#4815](https://github.com/kubernetes/enhancements/issues/5075), and [#5007](https://github.com/kubernetes/enhancements/issues/5007)) led by SIG Scheduling and SIG Node.
+This work was done across several KEPs (including [#5004](https://kep.k8s.io/5004), [#4817](https://kep.k8s.io/4817), [#5055](https://kep.k8s.io/5055), [#5075](https://kep.k8s.io/5075), [#4815](https://kep.k8s.io/5075), and [#5007](https://kep.k8s.io/issues/5007)) led by SIG Scheduling and SIG Node.
 
 ### Statusz for Kubernetes Components
 
@@ -386,7 +386,7 @@ With beta, `ComponentStatusz` is enabled by default across all core control‑pl
 backed by unit, integration, and end‑to‑end tests so it can be safely used in production for 
 observability and debugging workflows.
 
-This work was done as a part of [KEP #4827](https://github.com/kubernetes/enhancements/issues/4827) led by SIG Instrumentation
+This work was done as a part of [KEP #4827](https://kep.k8s.io/4827) led by SIG Instrumentation
 
 ### Flagz for Kubernetes Components 
 
@@ -403,7 +403,7 @@ keeping configuration insight aligned with existing security practices around he
 With beta, `ComponentFlagz` is now enabled by default and implemented across all core control‑plane components 
 and node agents, backed by unit, integration, and end‑to‑end tests to ensure the endpoint is reliable in production clusters.
 
-This work was done as a part of [KEP #4828](https://github.com/kubernetes/enhancements/issues/4828) led by SIG Instrumentation
+This work was done as a part of [KEP #4828](https://kep.k8s.io/4828) led by SIG Instrumentation
 
 ### Mixed Version Proxy (aka Unknown Version Interoperability Proxy)
 
@@ -417,7 +417,7 @@ help operators understand how often requests are forwarded and to which peers.
 Together, these changes make it easier to run highly available, mixed-version API control planes in production 
 while performing multi-step or partial control-plane upgrades.
 
-This work was done as a part of [KEP #4020](https://github.com/kubernetes/enhancements/issues/4020) led by SIG API-Machinery
+This work was done as a part of [KEP #4020](https://kep.k8s.io/4020) led by SIG API-Machinery
 
 ### Support memory qos with cgroups v2
 
@@ -426,7 +426,7 @@ controls with pod requests and limits, reducing interference and thrashing for w
 This iteration also refines how kubelet programs memory.high and memory.min, adds metrics and safeguards to avoid livelocks, 
 and introduces configuration options so cluster operators can tune memory protection behavior for their environments.
 
-This work was done as part of [KEP #2570](https://github.com/kubernetes/enhancements/issues/2570) led by SIG Node
+This work was done as part of [KEP #2570](https://kep.k8s.io/2570) led by SIG Node
 
 ## New features in Alpha
 
@@ -461,7 +461,7 @@ it enables the HPA to stay active even with zero running pods,
 automatically scaling the deployment back up as soon as the external metric (e.g., queue length) 
 indicates that new tasks have arrived.
 
-This work was done as part of [KEP #2021](https://github.com/kubernetes/enhancements/issues/2021) led by SIG Autoscaling.
+This work was done as part of [KEP #2021](https://kep.k8s.io/2021) led by SIG Autoscaling.
 
 ### DRA features in Alpha
 
@@ -477,7 +477,7 @@ combined with support for List Types in attributes, transform DRA from a low-lev
 capable of handling the sophisticated networking and compute requirements of modern AI and 
 high-performance computing (HPC) stacks.
 
-This work was done across several KEPs (including [#5729](https://github.com/kubernetes/enhancements/issues/5729), [#5304](https://github.com/kubernetes/enhancements/issues/5304), [#5517](https://github.com/kubernetes/enhancements/issues/5517), [#5677](https://github.com/kubernetes/enhancements/issues/5677), and [#5491](https://github.com/kubernetes/enhancements/issues/5491)) led by SIG Scheduling and SIG Node.
+This work was done across several KEPs (including [#5729](https://kep.k8s.io/5729), [#5304](https://kep.k8s.io/5304), [#5517](https://kep.k8s.io/5517), [#5677](https://kep.k8s.io/5677), and [#5491](https://kep.k8s.io/5491)) led by SIG Scheduling and SIG Node.
 
 ### Native Histogram Support for Kubernetes Metrics
 
@@ -490,7 +490,7 @@ Now, cluster operators can capture precise latency distributions for the kube-ap
 the overhead of manual bucket management. This architectural shift ensures more reliable SLIs and SLOs, 
 providing high-fidelity heatmaps that remain accurate even during the most unpredictable workload spikes.
 
-This work was done as part of [KEP #5808](https://github.com/kubernetes/enhancements/issues/5808) led by SIG Instrumentation.
+This work was done as part of [KEP #5808](https://kep.k8s.io/5808) led by SIG Instrumentation.
 
 ### Manifest Based Admission Control Config
 
@@ -562,22 +562,22 @@ This release includes a total of 18 enhancements promoted to stable:
 
 - [Support User Namespaces in pods](https://kep.k8s.io/127)
 - [API for external signing of Service Account tokens](https://kep.k8s.io/740)
-- [Speed up recursive SELinux label change](https://github.com/kubernetes/enhancements/issues/1710)
-- [Portworx file in-tree to CSI driver migration](https://github.com/kubernetes/enhancements/issues/2589)
-- [Fine grained Kubelet API authorization](https://github.com/kubernetes/enhancements/issues/2862)
-- [Mutating Admission Policies](https://github.com/kubernetes/enhancements/issues/3962)
-- [Node log query](https://github.com/kubernetes/enhancements/issues/2258)
-- [VolumeGroupSnapshot](https://github.com/kubernetes/enhancements/issues/3476)
-- [Mutable CSINode Allocatable Property](https://github.com/kubernetes/enhancements/issues/4876)
-- [DRA: Prioritized Alternatives in Device Requests](https://github.com/kubernetes/enhancements/issues/4816)
-- [Support PSI based on cgroupv2](https://github.com/kubernetes/enhancements/issues/4205)
-- [add ProcMount option](https://github.com/kubernetes/enhancements/issues/4265)
-- [DRA: Extend PodResources to include resources from Dynamic Resource Allocation](https://github.com/kubernetes/enhancements/issues/3695)
-- [VolumeSource: OCI Artifact and/or Image](https://github.com/kubernetes/enhancements/issues/4639)
-- [Split L3 Cache Topology Awareness in CPU Manager](https://github.com/kubernetes/enhancements/issues/5109)
-- [DRA: AdminAccess for ResourceClaims and ResourceClaimTemplates](https://github.com/kubernetes/enhancements/issues/5018)
-- [Remove gogo protobuf dependency for Kubernetes API types](https://github.com/kubernetes/enhancements/issues/5589)
-- [CSI driver opt-in for service account tokens via secrets field](https://github.com/kubernetes/enhancements/issues/5538)
+- [Speed up recursive SELinux label change](https://kep.k8s.io/1710)
+- [Portworx file in-tree to CSI driver migration](https://kep.k8s.io/2589)
+- [Fine grained Kubelet API authorization](https://kep.k8s.io/2862)
+- [Mutating Admission Policies](https://gkep.k8s.io/3962)
+- [Node log query](https://kep.k8s.io/2258)
+- [VolumeGroupSnapshot](https://kep.k8s.io/3476)
+- [Mutable CSINode Allocatable Property](https://kep.k8s.io/4876)
+- [DRA: Prioritized Alternatives in Device Requests](https://kep.k8s.io/4816)
+- [Support PSI based on cgroupv2](https://kep.k8s.io/4205)
+- [add ProcMount option](https://kep.k8s.io/4265)
+- [DRA: Extend PodResources to include resources from Dynamic Resource Allocation](https://kep.k8s.io/3695)
+- [VolumeSource: OCI Artifact and/or Image](https://kep.k8s.io/4639)
+- [Split L3 Cache Topology Awareness in CPU Manager](https://kep.k8s.io/5109)
+- [DRA: AdminAccess for ResourceClaims and ResourceClaimTemplates](https://kep.k8s.io/5018)
+- [Remove gogo protobuf dependency for Kubernetes API types](https://kep.k8s.io/5589)
+- [CSI driver opt-in for service account tokens via secrets field](https://kep.k8s.io/5538)
 
 ## Deprecations removals, and community updates
 
