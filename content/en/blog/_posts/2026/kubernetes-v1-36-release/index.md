@@ -324,7 +324,7 @@ Using the `kubectl.config.k8s.io/v1beta1` schema, teams can define aliases, set 
 and establish policies for credential plugins (including allowlists) to enforce safer authentication practices. 
 Users can disable this functionality if needed by setting the `KUBECTL_KUBERC=false` or `KUBERC=off` environment variables.
 
-This work was done as a part of [KEP #3104](https://kep.k8s.io/3104) led by SIG Auth
+This work was done as a part of [KEP #3104](https://kep.k8s.io/3104) led by SIG CLI, with the help from SIG Auth.
 
 ### Mutable Container Resources when Job is suspended
 
