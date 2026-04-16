@@ -367,7 +367,7 @@ By integrating these features with [extended resource](/docs/concepts/scheduling
 Kubernetes provides a robust production-ready alternative to the legacy device plugin system, 
 enabling complex AI and HPC workloads to manage hardware with unprecedented precision and operational safety.
 
-This work was done across several KEPs (including [#5004](https://kep.k8s.io/5004), [#4817](https://kep.k8s.io/4817), [#5055](https://kep.k8s.io/5055), [#5075](https://kep.k8s.io/5075), [#4815](https://kep.k8s.io/5075), and [#5007](https://kep.k8s.io/issues/5007)) led by SIG Scheduling and SIG Node.
+This work was done across several KEPs (including [#5004](https://kep.k8s.io/5004), [#4817](https://kep.k8s.io/4817), [#5055](https://kep.k8s.io/5055), [#5075](https://kep.k8s.io/5075), [#4815](https://kep.k8s.io/4815), and [#5007](https://kep.k8s.io/issues/5007)) led by SIG Scheduling and SIG Node.
 
 ### Statusz for Kubernetes Components
 
