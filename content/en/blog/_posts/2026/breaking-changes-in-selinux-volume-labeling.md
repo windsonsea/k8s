@@ -61,7 +61,7 @@ The project rolled this out in phases:
 <!-- a heavily edited copy from the previous blog + docs in https://kubernetes.io/docs/tasks/configure-pod-container/security-context/ -->
 
 If a Pod and its volume meet **all** of the following conditions, Kubernetes will
-_mount_ the volume directly with the right SELinux label. Such a mount will happen
+mount the volume directly with the right SELinux label. Such a mount will happen
 in a constant time and the container runtime will not need to recursively
 relabel any files on it. For such a mount to happen: 
 
