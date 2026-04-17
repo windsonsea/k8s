@@ -6,7 +6,7 @@ date: 2026-04-29T10:30:00-08:00
 slug: breaking-changes-in-selinux-volume-labeling
 author: >
   [Jan Šafránek](https://github.com/jsafrane) (Red Hat)
-  [Swathi Rao](https://github.com/SwathiR03) (independent)
+  [Swathi Rao](https://github.com/SwathiR03) (Independent)
 ---
 
 If you run Kubernetes on Linux with SELinux in enforcing mode, plan ahead: a future release (anticipated to be v1.37) is
@@ -15,13 +15,13 @@ for most workloads, but **it can break applications** that still depend on the o
 model in subtle ways (for example, sharing one volume between privileged and unprivileged Pods on the same node).
 Kubernetes v1.36 is the right release to audit your cluster and fix or opt out of this change.
 
-If your nodes do not use SELinux, nothing changes for you: kubelet skips the whole
+If your nodes do not use SELinux, nothing changes for you: the kubelet skips the whole
 SELinux logic when SELinux is unavailable or disabled in the Linux kernel. You can skip this article completely.
 
 This blog builds on the earlier work described in the
 [Kubernetes 1.27: Efficient SELinux Relabeling (Beta)](https://kubernetes.io/blog/2023/04/18/kubernetes-1-27-efficient-selinux-relabeling-beta/)
 post, where the `SELinuxMountReadWriteOncePod` feature gate was described. The problem to be addressed remains
-the same. However, this blog extends that same approach to all volumes.
+the same, however, this blog extends that same approach to all volumes.
 
 ## The problem
 Linux systems with Security Enhanced Linux (SELinux) enabled use labels attached to objects
@@ -33,11 +33,11 @@ The container runtime then recursively changes the SELinux label on all files th
 are visible to the Pod's containers. This can be time-consuming if there are
 many files on the volume, especially when the volume is on a remote filesystem.
 
-{{% alert title="Note" color="info" %}}
+{{< caution >}}
 If a container uses `subPath` of a volume, only that `subPath` of the whole
 volume is relabeled. This allows two Pods that have two different SELinux labels
 to use the same volume, as long as they use different subpaths of it.
-{{% /alert %}}
+{{< /caution >}}
 
 If a Pod does not have any SELinux label assigned in the Kubernetes API, the
 container runtime assigns a unique random label, so a process that potentially
@@ -47,7 +47,7 @@ random SELinux label.
 
 ## What Kubernetes is improving
 
-Where the stack supports it, kubelet can mount the volume with `-o context=<label>` so the kernel
+Where the stack supports it, the kubelet can mount the volume with `-o context=<label>` so the kernel
 applies the correct label for all inodes on that mount without a recursive inode traversal. That path is
 gated by feature flags and requires, among other things, that the Pod expose enough of an SELinux
 label (for example `spec.securityContext.seLinuxOptions.level`) and that the volume driver opts in (for CSI,
@@ -55,7 +55,7 @@ CSIDriver field `spec.seLinuxMount: true`).
 
 The project rolled this out in phases:
 
-- ReadWriteOncePod volumes  were handled under the `SELinuxMountReadWriteOncePod` feature gate, on by default since v1.28 and GA in v1.36.
+- ReadWriteOncePod volumes were handled under the `SELinuxMountReadWriteOncePod` feature gate, on by default since v1.28 and GA in v1.36.
 - Broader coverage was handled under the `SELinuxMount` flag, paired with the `spec.securityContext.seLinuxChangePolicy` field on Pods.
 
 <!-- a heavily edited copy from the previous blog + docs in https://kubernetes.io/docs/tasks/configure-pod-container/security-context/ -->
@@ -65,21 +65,21 @@ _mount_ the volume directly with the right SELinux label. Such a mount will happ
 in a constant time and the container runtime will not need to recursively
 relabel any files on it. For such a mount to happen: 
 
-1. The operating system must support SELinux. Without SELinux support detected, kubelet and the container runtime do not
+1. The operating system must support SELinux. Without SELinux support detected, the kubelet and the container runtime do not
    do anything with regard to SELinux.
 
 1. The [feature gate](/docs/reference/command-line-tools-reference/feature-gates/)
    `SELinuxMountReadWriteOncePod` must be enabled.
-   (If you're running Kubernetes v1.36, the feature is enabled unconditionally).
+   If you're running Kubernetes v1.36, the feature is enabled unconditionally.
 
 1. The Pod must use a PersistentVolumeClaim with applicable `accessModes`:
    * Either the volume has `accessModes: ["ReadWriteOncePod"]`
    * or the volume can use any other access mode(s), provided that the feature gates
      `SELinuxChangePolicy` and `SELinuxMount` are both enabled
-     **and** the Pod has `spec.securityContext.seLinuxChangePolicy` either nil (default) or set to `MountOption`.
+     **and** the Pod has `spec.securityContext.seLinuxChangePolicy` set to nil (default) or as `MountOption`.
 
-   The feature gate `SELinuxMount` is Beta and disabled by default in Kubernetes 1.36,
-   all other SELinux-related feature gates are now at general availability.
+   The feature gate `SELinuxMount` is Beta and disabled by default in Kubernetes 1.36. 
+   All other SELinux-related feature gates are now General Availability (GA).
 
    With any of these feature gates disabled, SELinux labels will always be
    applied by the container runtime via recursively traversing through the volume
@@ -92,7 +92,7 @@ relabel any files on it. For such a mount to happen:
    system defaults (typically `system_u`, `system_r` and `container_t`).
 
    Without Kubernetes knowing at least the SELinux `level`, the container
-   runtime will assign a random level _after_ the volumes are mounted. The
+   runtime will assign a random level after the volumes are mounted. The
    container runtime will still relabel the volumes recursively in that case.
 
 1. The volume plugin or the CSI driver responsible for the volume supports
@@ -118,7 +118,7 @@ Both of these cases work with recursive relabeling:
 1. Two Pods with different SELinux labels share the same volume, but each of them uses a different `subPath` to the volume.
 1. A privileged Pod and an unprivileged Pod share the same volume.
 
-The above scenarios will not work with modern, target behavior for Kubernetes mounting when SELinux is active. Instead, tne of these Pods will be stuck in `ContainerCreating` until the other Pod is terminated.
+The above scenarios will not work with modern, target behavior for Kubernetes mounting when SELinux is active. Instead, one of these Pods will be stuck in `ContainerCreating` until the other Pod is terminated.
 
 The first case is very niche and hasn't been seen in practice.
 Although the second case is still quite rare, this setup has been observed in applications.
@@ -133,13 +133,13 @@ In Kubernetes v1.36, this field is part of the stable Pod API.
 There are three choices available:
 
 _field not set_ (default)
-: In Kubernetes v1.36, the behavior depends on whether the `SELinuxMount` feature gate is enabled. By default that feature gate is not enabled, and the SELinux label is applied recursively. If you enable that feature gate in your cluster, and [all other conditions](#what-kubernetes-is-improving) are met, labelling will will be applied using the mount option.
+: In Kubernetes v1.36, the behavior depends on whether the `SELinuxMount` feature gate is enabled. By default that feature gate is not enabled, and the SELinux label is applied recursively. If you enable that feature gate in your cluster, and [all other conditions](#what-kubernetes-is-improving) are met, labelling will be applied using the mount option.
 
 `Recursive`
 : the SELinux label is applied recursively. This opts out from using the mount option.
 
 `MountOption`
-: the SELinux label is applied using the mount option, if [all other conditions](#what-kubernetes-is-improving)  are met. 
+: the SELinux label is applied using the mount option, if [all other conditions](#what-kubernetes-is-improving) are met. 
   This choice is available only when the `SELinuxMount` feature gate is enabled.
 
 ## SELinux warning controller (optional) {#selinux-warning-controller}
@@ -147,11 +147,11 @@ _field not set_ (default)
 Kubernetes v1.36 provides a new controller within the control plane, `selinux-warning-controller`.
 This controller runs within the kube-controller-manager controller.
 To use it, you pass `--controllers=*,selinux-warning-controller` on the kube-controller-manager command line;
-you also must not have explicitly overridden the `SELinuxChangePolicy` feature gate to disabled.
+you also must not have explicitly overridden the `SELinuxChangePolicy` feature gate to be disabled.
 
 The controller watches all Pods in the cluster and emits an Event when it finds two Pods that share the same
 volume in a way that is not compatible with the `SELinuxMount` feature gate.
-All such conflicting Pods will receive an event like
+All such conflicting Pods will receive an event, such as:
 ```console
 SELinuxLabel "system_u:system_r:container_t:s0:c98,c99" conflicts with pod my-other-pod that uses the same volume as this pod with SELinuxLabel "system_u:system_r:container_t:s0:c0,c1". If both pods land on the same node, only one of them may access the volume.
 ```
@@ -175,9 +175,9 @@ To ensure a smooth upgrade path from v1.36 to a release with `SELinuxMount` enab
 
 1. Enable selinux-warning-controller in the kube-controller-manager.
 1. Check the `selinux_warning_controller_selinux_volume_conflict` metric. It shows all *potential* conflicts between Pods.
-   For each conflicting Pod (Deployment, StatefulSet, ...), either apply the opt-out (set Pod's `spec.securityContext.seLinuxChangePolicy: Recursive`)
+   For each conflicting Pod (Deployment, StatefulSet, etc.), either apply the opt-out (set Pod's `spec.securityContext.seLinuxChangePolicy: Recursive`)
    or re-architect the application to remove such a conflict. For example, do your Pods really need to run as privileged?
-1. Check the `volume_manager_selinux_volume_context_mismatch_warnings_total` metric. This metric is emitted by kubelet when it actually
+1. Check the `volume_manager_selinux_volume_context_mismatch_warnings_total` metric. This metric is emitted by the kubelet when it actually
    starts a Pod that runs when `SELinuxMount` is disabled, but such a Pod won't start when `SELinuxMount` is enabled.
    This metric lists the number of Pods that will experience a true conflict. Unfortunately, this metric does not expose the exact Pod name as a label.
    The full Pod name is available only in the `selinux_warning_controller_selinux_volume_conflict` metric.
@@ -188,7 +188,7 @@ a [mutating webhook](/docs/reference/access-authn-authz/extensible-admission-con
 or a policy engine like [Kyverno](https://github.com/kyverno/kyverno/) or [Gatekeeper](https://github.com/open-policy-agent/gatekeeper)
 to apply the opt-out to all Pods in a namespace or across the entire cluster.
 
-When `SELinuxMount` is enabled, kubelet will emit the metric `volume_manager_selinux_volume_context_mismatch_errors_total` with the number of
+When `SELinuxMount` is enabled, the kubelet will emit the metric `volume_manager_selinux_volume_context_mismatch_errors_total` with the number of
 Pods that could not start because their SELinux label conflicts with an existing Pod that uses the same volume.
 The exact Pod names should still be available in the `selinux_warning_controller_selinux_volume_conflict` metric,
 if the selinux-warning-controller is enabled.
