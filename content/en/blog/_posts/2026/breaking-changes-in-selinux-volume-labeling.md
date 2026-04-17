@@ -167,7 +167,7 @@ selinux_warning_controller_selinux_volume_conflict{pod1_name="my-other-pod",pod1
 ```
 
 There is a security consequence from enabling this opt-in controller: it may reveal namespace names, which are always present in the metric.
-The Kubernetes project assumes only authorized personnel can access kube-controller-manager metrics.
+The Kubernetes project assumes only cluster admins can access kube-controller-manager metrics.
 
 ## Suggested upgrade path
 
