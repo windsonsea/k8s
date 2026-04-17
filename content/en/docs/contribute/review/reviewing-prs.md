@@ -168,7 +168,7 @@ Some checks to consider:
 ### Website infrastructure
 
 For changes involving the website framework (such as Hugo upgrades, Docsy theme updates),
-Reviewers should ask the PR author to confirm the site builds without errors in production mode, or verify it themselves.
+Reviewers must ask the PR author to confirm the site builds without errors in production mode, or verify it themselves.
 This is necessary because automated Netlify previews may not catch specific asset transformation 
 or path resolution errors that only trigger during a full production build.
 
@@ -195,7 +195,7 @@ Reviewers can verify the build using one of the following methods:
   make production-build
   ```
  
-- **Direct Hugo command:** The fastest way to check the build without serving the site.
+- **Direct Hugo command:** The fastest way to perform the production build without serving the site.
 
   ```bash
   hugo --gc --minify --templateMetrics --environment production
@@ -223,6 +223,7 @@ execute of template failed: template: shortcodes/cve-feed.html:3:14:
 failed to transform "scss/main.scss" (text/x-scss): SCSS processing failed
 ```
 
+Review the Netlify preview to see how the failure is rendered on the site.
 If the production build fails, the PR must not be merged until the author addresses the
 transformation or template errors.
 
