@@ -68,7 +68,7 @@ Kubernetes v1.36 introduces a comprehensive suite of Workload Aware Scheduling (
 natively integrating the Job controller with a new Workload API and a decoupled PodGroup API 
 to treat related pods as a single logical entity.
 
-As of v1.35, the scheduler could perform Gang Scheduling by ensuring 
+As of v1.35, the scheduler could perform [gang scheduling](https://kubernetes.io/docs/concepts/scheduling-eviction/gang-scheduling/) by ensuring 
 a minimum number of pods are ready before any are bound, 
 while the new work in gang scheduling in v1.36 includes a new 
 PodGroup scheduling cycle, which atomically evaluates the entire pod group.
