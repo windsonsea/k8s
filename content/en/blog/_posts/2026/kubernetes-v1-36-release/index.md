@@ -119,24 +119,7 @@ resource exhaustion errors from the CSI driver, without requiring a component re
 This ensures the Kubernetes scheduler maintains an accurate view of storage availability, 
 preventing pod scheduling failures caused by outdated volume limits.
 
-This work was done as part of [KEP #4876](https://kep.k8s.io/4876) led by SIG Storage.
-
-### Speed up recursive SELinux label change
-
-In Kubernetes v1.36, the `SELinuxMountReadWriteOncePod` and `SELinuxChangePolicy` features graduate to GA, 
-completing a multi‑release effort to dramatically speed up SELinux volume relabeling for pods. 
-Instead of recursively changing the SELinux label of every file on a volume at container start, 
-Kubernetes can now mount volumes directly with the correct label when certain access modes are used. 
-This significantly reduces container startup time for workloads with large volumes, cutting down on 
-long cold starts and noisy-node behavior in SELinux‑enforcing environments. 
-
-The new `SELinuxChangePolicy` option lets you opt pods into this optimized behavior safely, 
-with controllers emitting warnings when they detect configurations that will stop working in future releases. 
-With these features stable, clusters running with SELinux enabled get a more predictable, 
-performant startup path while setting the stage for stricter, 
-safer SELinux enforcement in Kubernetes 1.37 and beyond.
-
-This work was done as a part of [KEP #1710](https://kep.k8s.io/1710) led by SIG Node and SIG Storage. 
+This work was done as part of [KEP #4876](https://kep.k8s.io/4876) led by SIG Storage. 
 
 ### API for external signing of Service Account tokens
 
