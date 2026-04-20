@@ -507,7 +507,7 @@ paving the way for more secure and reproducible cluster deployments.
 
 This work was done as part of [KEP #5793](https://kep.k8s.io/5793) led by SIG API Machinery.
 
-### CRI List Streaming
+### CRI list streaming
 
 With the introduction of CRI List Streaming in Alpha, Kubernetes v1.36 will have additional server-side streaming operations. 
 This enhancement addresses the memory pressure and latency spikes often seen on large-scale nodes by replacing traditional,
