@@ -48,8 +48,9 @@ common monitoring and observability use cases.
 Previously, Kubernetes lacked a native way to report the health of allocated devices, 
 making it difficult to diagnose Pod crashes caused by hardware failures. 
 Building on the initial alpha release in v1.31 which focused on Device Plugins, 
-Kubernetes v1.36 expands this feature to support Dynamic Resource Allocation (DRA), 
-introducing the `allocatedResourcesStatus` field to provide a unified health 
+Kubernetes v1.36 expands this feature by 
+introducing the `allocatedResourcesStatus` field within the `.status` for each Pod, 
+which provides a unified health 
 reporting mechanism for all specialized hardware.
 
 Users can now run `kubectl describe pod` to determine if a container's crash loop is 
