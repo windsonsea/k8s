@@ -93,7 +93,7 @@ This work was done as part of [KEP #3476](https://kep.k8s.io/3476) led by SIG St
 
 ### CSI driver opt-in for service account tokens via secrets field
 
-Security for storage integrations reaches a higher standard in Kubernetes v1.36 with 
+Security for storage integrations is improved in Kubernetes v1.36 with 
 the graduation of CSI Service Account Token Secret Redaction to Stable. 
 This improvement eliminates a long-standing security risk where sensitive service account tokens, 
 intended only for the storage driver, were inadvertently exposed within 
