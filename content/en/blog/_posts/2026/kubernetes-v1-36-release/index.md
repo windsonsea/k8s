@@ -36,7 +36,7 @@ graduation of fine-grained `kubelet` API authorization to General Availability
 
 The `KubeletFineGrainedAuthz` feature gate was introduced as an opt-in alpha feature
 in Kubernetes v1.32, then graduated to beta (enabled by default) in v1.33. 
-Now, the feature is generally available, and the feature gate is locked to enable. 
+Now, the feature is generally available.
 This feature enables more precise, least-privilege access control over the `kubelet`'s 
 HTTPS API replacing the need to grant the overly broad nodes/proxy permission for 
 common monitoring and observability use cases.
