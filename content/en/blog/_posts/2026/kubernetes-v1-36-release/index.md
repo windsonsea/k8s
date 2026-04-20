@@ -77,7 +77,7 @@ This work was done across several KEPs (including [#4671](https://kep.k8s.io/467
 
 ## Features graduating to Stable
 
-This is a selection of some of the improvements that are now stable following the v1.36 release.
+_This is a selection of some of the improvements that are now stable following the v1.36 release._
 
 ### Volume Group Snapshots
 
