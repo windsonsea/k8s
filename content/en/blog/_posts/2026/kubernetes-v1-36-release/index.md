@@ -109,9 +109,8 @@ This work was done as part of [KEP #5538](https://kep.k8s.io/5538) led by SIG St
 ### Mutable CSINode Allocatable Property
 
 In Kubernetes v1.36, the Mutable `CSINode` Allocatable feature graduates to stable. 
-This enhancement resolves a limitation where node storage resource limits, 
-such as the maximum number of volumes a node can attach, 
-were static and set only during the initial registration of the Container Storage Interface (CSI) driver.
+This enhancement allows [Container Storage Interface (CSI)](https://kubernetes-csi.github.io/docs/introduction.html) drivers to
+dynamically update the reported maximum number of volumes that a node can handle.
 
 With this update, the `kubelet` can dynamically update a node's volume limits and capacity information. 
 The `kubelet` adjusts these limits based on periodic checks or in response to 
