@@ -296,6 +296,22 @@ This work was done as part of [KEP #4639](https://kep.k8s.io/4639) led by SIG No
 
 This is a selection of some of the improvements that are now beta following the v1.36 release.
 
+### Staleness mitigation for controllers
+
+Staleness in Kubernetes controllers is a problem that affects many controllers and can subtly affect controller behavior. 
+It is usually not until it is too late, when a controller in production has already taken incorrect action, 
+that staleness is found to be an issue due to some underlying assumption made by the controller author. 
+This could lead to conflicting updates or data corruption when a new instance of the same controller took over.
+
+We are excited to announce that Kubernetes v1.36 includes new features that help mitigate controller staleness and 
+provide better observability of controller behavior. The kube-apiserver can now leverage the ControllerTerm 
+in the Lease object to verify that a controller is the current valid leader before committing changes. 
+This ensures that only the active, authoritative controller can modify resources, providing higher 
+reliability for mission-critical automation and preventing the race conditions that commonly plague 
+distributed control loops during failover events.
+
+This work was done as part of [KEP #5647](https://kep.k8s.io/5647) led by SIG API Machinery.
+
 ### IP/CIDR validation improvements
 
 In Kubernetes v1.36, the `StrictIPCIDRValidation` feature for API IP and CIDR fields graduates to beta, 
@@ -431,22 +447,6 @@ This work was done as part of [KEP #2570](https://kep.k8s.io/2570) led by SIG No
 ## New features in Alpha
 
 This is a selection of some of the improvements that are now alpha following the v1.36 release.
-
-### Staleness mitigation for controllers
-
-Staleness in Kubernetes controllers is a problem that affects many controllers and can subtly affect controller behavior. 
-It is usually not until it is too late, when a controller in production has already taken incorrect action, 
-that staleness is found to be an issue due to some underlying assumption made by the controller author. 
-This could lead to conflicting updates or data corruption when a new instance of the same controller took over.
-
-We are excited to announce that Kubernetes v1.36 includes new features that help mitigate controller staleness and 
-provide better observability of controller behavior. The kube-apiserver can now leverage the ControllerTerm 
-in the Lease object to verify that a controller is the current valid leader before committing changes. 
-This ensures that only the active, authoritative controller can modify resources, providing higher 
-reliability for mission-critical automation and preventing the race conditions that commonly plague 
-distributed control loops during failover events.
-
-This work was done as part of [KEP #5647](https://kep.k8s.io/5647) led by SIG API Machinery.
 
 ### HPA Scale to Zero for Custom Metrics
 
