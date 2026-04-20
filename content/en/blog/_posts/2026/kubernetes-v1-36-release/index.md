@@ -479,7 +479,7 @@ high-performance computing (HPC) stacks.
 
 This work was done across several KEPs (including [#5729](https://kep.k8s.io/5729), [#5304](https://kep.k8s.io/5304), [#5517](https://kep.k8s.io/5517), [#5677](https://kep.k8s.io/5677), and [#5491](https://kep.k8s.io/5491)) led by SIG Scheduling and SIG Node.
 
-### Native Histogram Support for Kubernetes Metrics
+### Native histogram support for Kubernetes metrics
 
 High-resolution monitoring reaches a new milestone in Kubernetes v1.36 with the introduction of Native Histogram support 
 in Alpha. While classical Prometheus histograms relied on static, pre-defined buckets that often forced a compromise 
