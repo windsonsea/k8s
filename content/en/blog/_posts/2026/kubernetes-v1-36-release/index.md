@@ -95,7 +95,7 @@ This work was done as part of [KEP #3476](https://kep.k8s.io/3476) led by SIG St
 
 Security for storage integrations is improved in Kubernetes v1.36 with 
 the graduation of CSI Service Account Token Secret Redaction to Stable. 
-This improvement eliminates a long-standing security risk where sensitive service account tokens, 
+This feature eliminates a long-standing security risk where sensitive Service Account tokens, 
 intended only for the storage driver, were inadvertently exposed within 
 the Secret field of CSI volume objects, making them visible to unauthorized users with 
 basic read access to the API.
