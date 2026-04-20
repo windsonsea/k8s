@@ -435,8 +435,8 @@ This is a selection of some of the improvements that are now alpha following the
 
 Since now, the Horizontal Pod Autoscaler (HPA) required a minimum of at least one replica to remain active, 
 as it could only calculate scaling needs based on metrics (like CPU or Memory) from running pods. 
-Kubernetes v1.36 continues the development of the HPA Scale to Zero feature in Alpha, allowing workloads 
-to scale down to zero replicas specifically when using Object or External metrics.
+Kubernetes v1.36 continues the development of the HPA Scale to Zero feature (disabled by default) in Alpha, 
+allowing workloads to scale down to zero replicas specifically when using Object or External metrics.
 
 Now, users can experiment with significantly reducing infrastructure costs by completely idling heavy workloads when 
 no work is pending. While the feature remains behind the HPAScaleToZero feature gate, 
