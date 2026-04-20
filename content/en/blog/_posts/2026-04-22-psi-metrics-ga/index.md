@@ -29,26 +29,26 @@ Our testing focused on two primary scenarios to isolate the impact of the kernel
 2. **Kernel PSI ON / Kubelet Feature OFF** vs **Kernel PSI ON / Kubelet Feature ON** (Kubelet overhead)
 
 #### Scenario 1: The Kernel Overhead
-First, we evaluated the underlying overhead of enabling PSI on the Linux kernel. By comparing a cluster booted with `psi=1` against a cluster with `psi=0`, we isolated the exact cost of the OS-level bookkeeping. Even under heavy I/O and CPU load at an 80-pod density, the **System CPU** delta between the kernel-enabled and kernel-disabled clusters remained consistently between **20m (0.02 cores)** and **37m (0.037 cores)**. This confirms that the internal kernel tracking is highly efficient.
+First, we evaluated the underlying overhead of enabling PSI on the Linux kernel. By comparing a cluster booted with `psi=1` against a cluster with `psi=0`, we isolated the exact cost of the OS-level bookkeeping. Even under heavy I/O and CPU load at an 80-pod density, the **System CPU** delta between the kernel-enabled and kernel-disabled clusters remained consistently between **0.037 cores** and **0.2 cores**. This confirms that the internal kernel tracking is highly efficient.
 
 {{< figure src="/images/node_sys_cpu_usage_rate_comparison.png" alt="A line graph comparing the Node System (Kernel) CPU usage rate over elapsed time." title="(Case 1) Node System CPU Usage Rate Comparison" caption="Figure 1: Node system CPU comparison isolating Kubelet overhead under load." >}}
 
-The kubelet serves as the primary collector for these metrics. Figure 2 zooms in on the kubelet process itself. The results show that even while the kubelet performs periodic _sweeps_ to aggregate data from the cgroup hierarchy, its CPU usage remains remarkably low with interchangeabl spikes.
+Figure 2 zooms in on the kubelet process itself, which serves as the primary collector for these metrics. . The results show that even while the kubelet performs periodic _sweeps_ to aggregate data from the cgroup hierarchy, its CPU usage remains remarkably low with interchangeabl spikes and nothing exceeding **0.25 cores** for longer than a second.
 
 {{< figure src="/images/kubelet_cpu_usage_rate_comparison.png" alt="A line graph comparing the kubelet CPU usage rate over elapsed time with the PSI feature turned off versus on." title="(Case 1) Kubelet CPU Usage Rate Comparison" caption="Figure 2: Kubelet CPU Usage Rate Comparison." >}}
 
 #### Scenario 2: The Kubelet Overhead
-Next, we evaluated the Kubelet overhead (Case 2). For these tests, the Linux kernel was already tracking pressure on both clusters, but we toggled the `KubeletPSI` feature gate to see if actively querying and exposing these metrics impacted the resource usage. As seen in the following graph, the **System CPU** usage lines for the Kubelet PSI-enabled (red) and Kubelet PSI-disabled (blue) clusters are virtually indistinguishable, with a slight expected increase from the baseline. This visualizes that once the OS is tracking PSI, the act of Kubernetes reading those cgroup metrics is safe for production-scale deployments. 
+Next, we evaluated the Kubelet overhead (Case 2). For these tests, the Linux kernel was already tracking pressure on both clusters (`psi=1`), but we toggled the `KubeletPSI` feature gate to see if actively querying and exposing these metrics impacted the resource usage. As seen in the following graph, the **System CPU** usage lines for the Kubelet PSI-enabled (red) and Kubelet PSI-disabled (blue) clusters are virtually indistinguishable, with a slight expected increase and delay from the baseline. This visualizes that once the OS is tracking PSI, at around **2.5 cores**, the act of Kubernetes reading those cgroup metrics is negligible to performnace. 
 
 {{< figure src="/images/kubeletPSI_sys_cpu_usage_rate_graph.png" alt="A line graph comparing the system CPU usage rate over elapsed time with the PSI feature turned off versus on and kernel PSI off." title="(Case 2) System CPU Usage Rate Comparison" caption="Figure 3: System CPU Usage Rate Comparison." >}}
 
-As for the Kubelet usage, the synchronized bursts seen in the graph are practically identical in both magnitude and frequency, confirming that the Kubelet's collection logic is highly lightweight and blends seamlessly into standard housekeeping cycles. There is no issue about the feature affecting the pre-existing resource use.
+As for the Kubelet usage, the synchronized bursts seen in the graph are practically identical in both magnitude and frequency, confirming that the Kubelet's collection logic is highly lightweight and blends seamlessly into standard housekeeping cycles. There is no issue about the feature affecting the pre-existing resource use and is therefore safe for production-scale deployments..
 
 {{< figure src="/images/kubeletPSI_kubelet_cpu_usage_rate_graph.png" alt="A line graph comparing the kubelet CPU usage rate over elapsed time with the PSI feature turned off versus on and kernel PSI always on." title="(Case 2) Kubelet CPU Usage Rate Comparison" caption="Figure 4: Kubelet CPU Usage Rate Comparison." >}} 
 
 ## Improvements between beta (1.34) and stable (1.36)
 
-- **Smarter Metric Emission for GA:** We improved how the Kubelet handles underlying OS support for PSI. Previously, if the feature was enabled in Kubernetes but the underlying Linux kernel didn't support PSI (e.g., booted with psi=0), the Kubelet would emit misleading zero-valued metrics. These could trigger false alarms or clutter dashboards when read as real metrics instead of missing values. In v1.36, the Kubelet now detects OS-level PSI support via cgroup configurations before reporting. This ensures that pressure metrics are only collected and emitted when they are genuinely supported by the node, providing cleaner data for monitoring and alerting systems.
+- **Smarter Metric Emission for GA:** We improved how the Kubelet handles underlying OS support for PSI. Previously, if the feature was enabled in Kubernetes but the underlying Linux kernel didn't support PSI (`psi=0`), the Kubelet would emit misleading zero-valued metrics. These could trigger false alarms or clutter dashboards when read as real metrics instead of missing values. In v1.36, the Kubelet now detects OS-level PSI support via cgroup configurations before reporting. This ensures that pressure metrics are only collected and emitted when they are actually supported by the node, providing cleaner data for monitoring and alerting systems.
 
 ## Getting started
 
@@ -59,7 +59,7 @@ To use PSI metrics in your Kubernetes cluster, your nodes must meet the followin
 
 As of v1.36, Kubelet PSI metrics are generally available and you do not need to opt in to any feature gate. 
 
-Once the OS prerequisites are met, you can start scraping the `/metrics/cadvisor` endpoint with your Prometheus-compatible monitoring solution or query the Summary API to collect and visualize the new PSI metrics.. Note that PSI is a Linux-kernel feature, so these metrics are not available on Windows nodes. Your cluster can contain a mix of Linux and Windows nodes, and on the Windows nodes, the kubelet will simply omit the PSI metrics.
+Once the OS prerequisites are met, you can start scraping the `/metrics/cadvisor` endpoint with your Prometheus-compatible monitoring solution or query the Summary API to collect and visualize the new PSI metrics. Note that PSI is a Linux-kernel feature, so these metrics are not available on Windows nodes. Your cluster can contain a mix of Linux and Windows nodes, and on the Windows nodes, the kubelet will simply omit the PSI metrics.
 
 If your cluster is running a recent enough version of Kubernetes and you are a privileged node administrator, you can also proxy to the kubelet's HTTP API via the control plane's API server to see real-time pressure data from the Summary API. 
 
@@ -68,7 +68,7 @@ If your cluster is running a recent enough version of Kubernetes and you are a p
 ```bash
 CONTAINER_NAME="example-container"
 kubectl get --raw "/api/v1/nodes/$(kubectl get nodes -o jsonpath='{.items[0].metadata.name}')/proxy/stats/summary" | jq '.pods[].containers[] | select(.name=="'"$CONTAINER_NAME"'") | {name, cpu: .cpu.psi, memory: .memory.psi, io: .io.psi}'
-``
+```
 
 ## Further reading
 
