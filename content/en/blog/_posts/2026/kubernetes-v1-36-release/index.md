@@ -689,7 +689,7 @@ You can find the latest event details [here](https://community.cncf.io/events/#/
 
 ## Upcoming Release Webinar
 
-Join members of the Kubernetes v1.36 Release Team on 20 May 2026 at 9 am PT to learn about the release highlights
+Join members of the Kubernetes v1.36 Release Team on **Wednesday, May 20th 2026 at 4:00 PM (UTC)** to learn about the release highlights
 of this release. For more information and registration, visit the [event page](https://community.cncf.io/events/details/cncf-cncf-online-programs-presents-cloud-native-live-kubernetes-v136-release/) on the CNCF Online Programs site.
 
 
