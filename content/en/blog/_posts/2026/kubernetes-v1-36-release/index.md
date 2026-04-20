@@ -417,7 +417,7 @@ help operators understand how often requests are forwarded and to which peers.
 Together, these changes make it easier to run highly available, mixed-version API control planes in production 
 while performing multi-step or partial control-plane upgrades.
 
-This work was done as a part of [KEP #4020](https://kep.k8s.io/4020) led by SIG API-Machinery
+This work was done as a part of [KEP #4020](https://kep.k8s.io/4020) led by SIG API Machinery
 
 ### Support memory qos with cgroups v2
 
