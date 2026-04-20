@@ -106,7 +106,7 @@ the dedicated `secrets` field. Driver authors can enable this behavior by updati
 
 This work was done as part of [KEP #5538](https://kep.k8s.io/5538) led by SIG Storage.
 
-### Mutable CSINode Allocatable Property
+### Mutable volume attach limits
 
 In Kubernetes v1.36, the Mutable `CSINode` Allocatable feature graduates to stable. 
 This enhancement allows [Container Storage Interface (CSI)](https://kubernetes-csi.github.io/docs/introduction.html) drivers to
