@@ -492,7 +492,7 @@ providing high-fidelity heatmaps that remain accurate even during the most unpre
 
 This work was done as part of [KEP #5808](https://kep.k8s.io/5808) led by SIG Instrumentation.
 
-### Manifest Based Admission Control Config
+### Manifest based admission control config
 
 Managing admission controllers moves toward a more declarative and consistent model in Kubernetes v1.36 with the 
 introduction of Manifest-based Admission Control Configuration in Alpha. 
