@@ -267,13 +267,12 @@ _This is a selection of some of the improvements that are now beta following the
 ### Staleness mitigation for controllers
 
 Staleness in Kubernetes controllers is a problem that affects many controllers and can subtly affect controller behavior. 
-It is usually not until it is too late, when a controller in production has already taken incorrect action, 
-that staleness is found to be an issue due to some underlying assumption made by the controller author. 
-This could lead to conflicting updates or data corruption when a new instance of the same controller took over.
+It is usually not until it is too late, when a controller in production has already taken incorrect action,
+that staleness is found to be an issue due to some underlying assumption made by the controller author.
+This could lead to conflicting updates or data corruption upon controller reconciliation during times of cache staleness.
 
 We are excited to announce that Kubernetes v1.36 includes new features that help mitigate controller staleness and 
-provide better observability of controller behavior. The kube-apiserver can now leverage the ControllerTerm 
-in the Lease object to verify that a controller is the current valid leader before committing changes. 
+provide better observability of controller behavior.
 This ensures that only the active, authoritative controller can modify resources, providing higher 
 reliability for mission-critical automation and preventing the race conditions that commonly plague 
 distributed control loops during failover events.
