@@ -294,7 +294,7 @@ consistent data. With beta, `StrictIPCIDRValidation` is ready for wider use,
 giving operators more reliable guardrails around IP-related configuration 
 as they evolve networks and policies over time.
 
-This work was done as a part of [KEP #4858](https://kep.k8s.io/4858) led by SIG Network
+This work was done as a part of [KEP #4858](https://kep.k8s.io/4858) led by SIG Network.
 
 ### Separate kubectl user preferences from cluster configs
 
