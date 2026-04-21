@@ -24,31 +24,31 @@ Monitoring CPU or memory usage alone can be misleading. A node may report XX% (b
 
 A common concern when graduating telemetry features is the resource overhead required to collect and serve the metrics. To address this, SIG Node conducted extensive performance validation on high-density workloads (80+ pods) across various machine types.
 
-Our testing focused on two primary scenarios to isolate the impact of the kernel-level and the Kubelet collection respectively:
-1. **Kernel PSI OFF / Kubelet Feature ON** vs **Kernel PSI ON / Kubelet Feature ON** (Kernel overhead)
-2. **Kernel PSI ON / Kubelet Feature OFF** vs **Kernel PSI ON / Kubelet Feature ON** (Kubelet overhead)
+Our testing focused on two primary scenarios to isolate the impact of the Kubelet and kernel-level collection respectively:
+1. **Kernel PSI ON / Kubelet Feature OFF** vs **Kernel PSI ON / Kubelet Feature ON** (Kubelet overhead)
+2. **Kernel PSI OFF / Kubelet Feature ON** vs **Kernel PSI ON / Kubelet Feature ON** (Kernel overhead)
 
-#### Scenario 1: The Kernel Overhead
-First, we evaluated the underlying overhead of enabling PSI on the Linux kernel. By comparing a cluster booted with `psi=1` against a cluster with `psi=0`, we isolated the exact cost of the OS-level bookkeeping. Even under heavy I/O and CPU load at an 80-pod density, the **System CPU** delta between the kernel-enabled and kernel-disabled clusters remained consistently between **0.037 cores** and **0.2 cores**. This confirms that the internal kernel tracking is highly efficient.
+#### Scenario 1: The Kubelet Overhead
+First, we evaluated the Kubelet overhead (Case 1) on 4 core machines. For these tests, the Linux kernel was already tracking pressure on both clusters by default(`psi=1`), but we toggled the `KubeletPSI` feature gate to see if the Kubelet actively querying and exposing these metrics impacted the resource usage. As seen in the following graph, the **System CPU** usage lines for the Kubelet PSI-enabled (red) follows the same pattern as the Kubelet PSI-disabled (blue) clusters, with a slight expected increase and delay from the baseline. This visualizes that once the OS is tracking PSI, at around **2.5 cores**, the act of Kubernetes reading those cgroup metrics is negligible to performance. 
 
-{{< figure src="/images/node_sys_cpu_usage_rate_comparison.png" alt="A line graph comparing the Node System (Kernel) CPU usage rate over elapsed time." title="(Case 1) Node System CPU Usage Rate Comparison" caption="Figure 1: Node system CPU comparison isolating Kubelet overhead under load." >}}
+{{< figure src="/images/kubeletPSI_sys_cpu_usage_rate_graph.png" alt="A line graph comparing the system CPU usage rate over elapsed time with the PSI feature turned off versus on and kernel PSI off." title="(Case 1) System CPU Usage Rate Comparison" caption="Figure 1: Node System CPU Usage Rate Comparison." >}}
 
-Figure 2 zooms in on the kubelet process itself, which serves as the primary collector for these metrics. . The results show that even while the kubelet performs periodic _sweeps_ to aggregate data from the cgroup hierarchy, its CPU usage remains remarkably low with interchangeabl spikes and nothing exceeding **0.25 cores** for longer than a second.
+As for the Kubelet usage, the synchronized bursts seen in the graph are practically identical in both magnitude and frequency, confirming that the Kubelet's collection logic is highly lightweight and blends seamlessly into standard housekeeping cycles. There is no issue about the feature affecting the pre-existing resource use, staying within the normal 0.1 cores or **2.5% of the total node capacity**, and is therefore safe for production-scale deployments.
 
-{{< figure src="/images/kubelet_cpu_usage_rate_comparison.png" alt="A line graph comparing the kubelet CPU usage rate over elapsed time with the PSI feature turned off versus on." title="(Case 1) Kubelet CPU Usage Rate Comparison" caption="Figure 2: Kubelet CPU Usage Rate Comparison." >}}
+{{< figure src="/images/kubeletPSI_kubelet_cpu_usage_rate_graph.png" alt="A line graph comparing the kubelet CPU usage rate over elapsed time with the PSI feature turned off versus on and kernel PSI always on." title="(Case 1) Kubelet CPU Usage Rate Comparison" caption="Figure 2: Kubelet CPU Usage Rate Comparison." >}} 
 
-#### Scenario 2: The Kubelet Overhead
-Next, we evaluated the Kubelet overhead (Case 2). For these tests, the Linux kernel was already tracking pressure on both clusters (`psi=1`), but we toggled the `KubeletPSI` feature gate to see if actively querying and exposing these metrics impacted the resource usage. As seen in the following graph, the **System CPU** usage lines for the Kubelet PSI-enabled (red) and Kubelet PSI-disabled (blue) clusters are virtually indistinguishable, with a slight expected increase and delay from the baseline. This visualizes that once the OS is tracking PSI, at around **2.5 cores**, the act of Kubernetes reading those cgroup metrics is negligible to performnace. 
+#### Scenario 2: The Kernel Overhead
+Next, we evaluated the underlying overhead of enabling PSI on the Linux kernel also on a 4 core machine. By comparing a cluster booted with `psi=1` (COS default) against a cluster with `psi=0`, we isolated the exact cost of the OS-level bookkeeping. Even under heavy I/O and CPU load at an 80-pod density, the **System CPU** delta between the kernel-enabled and kernel-disabled clusters remained consistently between **0.037 cores** and **0.125 cores** or **0.925% - 3.125%** of the total node capacity. There was a single spike to **0.225 cores**, or **5.6%**, but was controlled back down within a few seconds. This confirms that the internal kernel tracking is highly efficient under load.
 
-{{< figure src="/images/kubeletPSI_sys_cpu_usage_rate_graph.png" alt="A line graph comparing the system CPU usage rate over elapsed time with the PSI feature turned off versus on and kernel PSI off." title="(Case 2) System CPU Usage Rate Comparison" caption="Figure 3: System CPU Usage Rate Comparison." >}}
+{{< figure src="/images/node_sys_cpu_usage_rate_comparison.png" alt="A line graph comparing the Node System (Kernel) CPU usage rate over elapsed time." title="(Case 2) Node System CPU Usage Rate Comparison" caption="Figure 3: Node System CPU Usage Rate Comparison." >}}
 
-As for the Kubelet usage, the synchronized bursts seen in the graph are practically identical in both magnitude and frequency, confirming that the Kubelet's collection logic is highly lightweight and blends seamlessly into standard housekeeping cycles. There is no issue about the feature affecting the pre-existing resource use and is therefore safe for production-scale deployments..
+Figure 4 zooms in on the kubelet process itself, which serves as the primary collector for these metrics. . The results show that even while the kubelet performs periodic _sweeps_ to aggregate data from the cgroup hierarchy, its CPU usage remains remarkably low with interchangeable spikes and nothing exceeding **0.25 cores** or **6.25%** of total capacity for longer than a second.
 
-{{< figure src="/images/kubeletPSI_kubelet_cpu_usage_rate_graph.png" alt="A line graph comparing the kubelet CPU usage rate over elapsed time with the PSI feature turned off versus on and kernel PSI always on." title="(Case 2) Kubelet CPU Usage Rate Comparison" caption="Figure 4: Kubelet CPU Usage Rate Comparison." >}} 
+{{< figure src="/images/kubelet_cpu_usage_rate_comparison.png" alt="A line graph comparing the kubelet CPU usage rate over elapsed time with the PSI feature turned off versus on." title="(Case 2) Kubelet CPU Usage Rate Comparison" caption="Figure 4: Kubelet CPU Usage Rate Comparison." >}}
 
 ## Improvements between beta (1.34) and stable (1.36)
 
-- **Smarter Metric Emission for GA:** We improved how the Kubelet handles underlying OS support for PSI. Previously, if the feature was enabled in Kubernetes but the underlying Linux kernel didn't support PSI (`psi=0`), the Kubelet would emit misleading zero-valued metrics. These could trigger false alarms or clutter dashboards when read as real metrics instead of missing values. In v1.36, the Kubelet now detects OS-level PSI support via cgroup configurations before reporting. This ensures that pressure metrics are only collected and emitted when they are actually supported by the node, providing cleaner data for monitoring and alerting systems.
+- **Smarter Metric Emission for GA:** We improved how the Kubelet handles underlying OS support for PSI. Previously, if the feature was enabled in Kubernetes but the underlying Linux kernel didn't support PSI (`psi=0`), the Kubelet would emit misleading zero-valued metrics. These could trigger false alarms when read as real metrics instead of missing values. In v1.36, the Kubelet now detects OS-level PSI support via cgroup configurations before reporting. This ensures that pressure metrics are only collected and emitted when they are actually supported by the node, providing cleaner data for monitoring and alerting systems.
 
 ## Getting started
 
