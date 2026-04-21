@@ -637,7 +637,7 @@ and other notable conferences worldwide. Stay informed and get involved with the
 - KCD - [Kubernetes Community Days: Czech & Slovak](https://community.cncf.io/events/details/cncf-kcd-czech-slovak-presents-kcd-czech-amp-slovak-prague-2026/): May 21, 2026 | Prague, Czechia
  
 **June 2026**
-- KCD - [Kubernetes Community Days: New York](https://community.cncf.io/events/details/cncf-kcd-new-york-presents-kcd-new-york-2026/): June 10, 2025 | New York, USA
+- KCD - [Kubernetes Community Days: New York](https://community.cncf.io/events/details/cncf-kcd-new-york-presents-kcd-new-york-2026/): June 10, 2026 | New York, USA
 - [KubeCon + CloudNativeCon India 2026: June 18-19, 2026](https://events.linuxfoundation.org/kubecon-cloudnativecon-india/) | Mumbai, India
 
 **July 2026**
