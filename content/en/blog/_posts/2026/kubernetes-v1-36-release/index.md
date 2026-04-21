@@ -262,7 +262,7 @@ This work was done as part of [KEP #4639](https://kep.k8s.io/4639) led by SIG No
 
 ## New features in Beta
 
-This is a selection of some of the improvements that are now beta following the v1.36 release.
+_This is a selection of some of the improvements that are now beta following the v1.36 release._
 
 ### Staleness mitigation for controllers
 
