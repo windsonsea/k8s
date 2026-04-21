@@ -92,21 +92,6 @@ feature gate is now locked to enabled.
 
 This work was done as part of [KEP #3476](https://kep.k8s.io/3476) led by SIG Storage.
 
-### CSI driver opt-in for service account tokens via secrets field
-
-Security for storage integrations is improved in Kubernetes v1.36 with 
-the graduation of CSI Service Account Token Secret Redaction to Stable. 
-This feature eliminates a long-standing security risk where sensitive Service Account tokens, 
-intended only for the storage driver, were inadvertently exposed within 
-the Secret field of CSI volume objects, making them visible to unauthorized users with 
-basic read access to the API.
-
-Kubernetes now allows CSI drivers to opt in to receive these short-lived tokens through 
-the dedicated `secrets` field. Driver authors can enable this behavior by updating the 
-`CSIDriver` object. This approach prevents token leakage in driver logs and protects workload identities.
-
-This work was done as part of [KEP #5538](https://kep.k8s.io/5538) led by SIG Storage.
-
 ### Mutable volume attach limits
 
 In Kubernetes v1.36, the Mutable `CSINode` Allocatable feature graduates to stable. 
