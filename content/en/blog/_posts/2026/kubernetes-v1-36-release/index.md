@@ -319,8 +319,8 @@ and other personal settings separately from `kubeconfig` files, which hold clust
 This separation prevents personal preferences from interfering with CI pipelines or shared `kubeconfig` files, 
 while maintaining a consistent `kubectl` experience across different clusters and contexts.
 
-Using the `kubectl.config.k8s.io/v1beta1` schema, teams can define aliases, set default options, 
-and establish policies for credential plugins (including allowlists) to enforce safer authentication practices. 
+In Kubernetes v1.36, `.kuberc` was expanded with the ability to define policies for credential plugins 
+(allowlists or denylists) to enforce safer authentication practicies. 
 Users can disable this functionality if needed by setting the `KUBECTL_KUBERC=false` or `KUBERC=off` environment variables.
 
 This work was done as a part of [KEP #3104](https://kep.k8s.io/3104) led by SIG CLI, with the help from SIG Auth.
