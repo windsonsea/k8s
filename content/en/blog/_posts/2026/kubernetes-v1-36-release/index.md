@@ -8,7 +8,7 @@ slug: kubernetes-v1-36-release
 author: >
   [Kubernetes v1.36 Release Team](https://github.com/kubernetes/sig-release/blob/master/releases/release-1.36/release-team.md)
 release_announcement:
-  minor_version: “1.36”
+  minor_version: "1.36"
 ---
 
 **Editors:** Chad M. Crowell, Kirti Goyal, Sophia Ugochukwu, Swathi Rao, Utkarsh Umre
