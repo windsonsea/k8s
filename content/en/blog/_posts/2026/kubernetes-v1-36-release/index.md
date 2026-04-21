@@ -336,7 +336,7 @@ making the transition incremental instead of a flag day. With beta in v1.36, `Co
 documented, and ready for wider adoption by platform teams that rely on impersonation for debugging, proxying, 
 or node‑level controllers.
 
-This work was done as a part of [KEP #5284](https://kep.k8s.io/5284) led by SIG Auth
+This work was done as a part of [KEP #5284](https://kep.k8s.io/5284) led by SIG Auth.
 
 ### DRA features in beta
 
