@@ -369,7 +369,7 @@ With beta, `ComponentStatusz` is enabled by default across all core control‑pl
 backed by unit, integration, and end‑to‑end tests so it can be safely used in production for 
 observability and debugging workflows.
 
-This work was done as a part of [KEP #4827](https://kep.k8s.io/4827) led by SIG Instrumentation
+This work was done as a part of [KEP #4827](https://kep.k8s.io/4827) led by SIG Instrumentation.
 
 ### Flagz for Kubernetes Components 
 
