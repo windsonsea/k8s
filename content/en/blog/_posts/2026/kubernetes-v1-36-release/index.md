@@ -82,13 +82,12 @@ _This is a selection of some of the improvements that are now stable following t
 
 ### Volume Group Snapshots
 
-After several cycles in beta, Volume Group Snapshots reach General Availability (GA) in Kubernetes v1.36. 
-This feature allows you to take crash-consistent snapshots across 
-multiple PersistentVolumeClaims simultaneously. 
-By ensuring that data and logs across different volumes remain synchronized, 
-this enhancement provides a robust solution for protecting complex, multi-volume workloads. 
-With this release, the API version promotes to v1 and the `CSIVolumeGroupSnapshot` 
-feature gate is now locked to enabled.
+After several cycles in beta, Volume Group Snapshots reach General Availability (GA) in Kubernetes v1.36.
+This feature allows you to take crash-consistent snapshots across multiple PersistentVolumeClaims simultaneously.
+The support for volume group snapshots relies on a set of [extension APIs for group snapshots](https://kubernetes-csi.github.io/docs/group-snapshot-restore-feature.html#volume-group-snapshot-apis). 
+These APIs allow users to take crash consistent snapshots for a set of volumes. 
+A key aim is to allow you to restore that set of snapshots to new volumes and recover your workload based on 
+a crash consistent recovery point.
 
 This work was done as part of [KEP #3476](https://kep.k8s.io/3476) led by SIG Storage.
 
