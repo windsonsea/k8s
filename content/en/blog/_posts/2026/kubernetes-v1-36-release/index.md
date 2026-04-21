@@ -272,8 +272,7 @@ This could lead to conflicting updates or data corruption upon controller reconc
 
 We are excited to announce that Kubernetes v1.36 includes new features that help mitigate controller staleness and 
 provide better observability of controller behavior.
-This ensures that only the active, authoritative controller can modify resources, while providing higher 
-reliability for mission-critical automations.
+This prevents reconciliation based on an outdated view of cluster state that can often lead to harmful behavior.
 
 This work was done as part of [KEP #5647](https://kep.k8s.io/5647) led by SIG API Machinery.
 
