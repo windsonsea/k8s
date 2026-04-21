@@ -313,7 +313,7 @@ This work was done as a part of [KEP #3104](https://kep.k8s.io/3104) led by SIG 
 
 In Kubernetes v1.36, the MutablePodResourcesForSuspendedJobs feature for Jobs graduates to beta.
 This update relaxes Job validation to allow updates to container CPU, memory, GPU, and extended resource requests 
-and limits whil a Job is suspended. This gives queue controllers and operators a safe hook to right‑size 
+and limits while a Job is suspended. This gives queue controllers and operators a safe hook to right‑size 
 batch workloads based on real‑time cluster conditions, rather than locking in resource guesses made at submit time. 
 For example, a queueing system can suspend incoming Jobs, adjust their resource requirements to match 
 available capacity or quota, then unsuspend them once the cluster can actually run them. 
@@ -386,7 +386,7 @@ keeping configuration insight aligned with existing security practices around he
 With beta, `ComponentFlagz` is now enabled by default and implemented across all core control‑plane components 
 and node agents, backed by unit, integration, and end‑to‑end tests to ensure the endpoint is reliable in production clusters.
 
-This work was done as a part of [KEP #4828](https://kep.k8s.io/4828) led by SIG Instrumentation
+This work was done as a part of [KEP #4828](https://kep.k8s.io/4828) led by SIG Instrumentation.
 
 ### Mixed Version Proxy (aka Unknown Version Interoperability Proxy)
 
@@ -409,7 +409,7 @@ controls with pod requests and limits, reducing interference and thrashing for w
 This iteration also refines how kubelet programs memory.high and memory.min, adds metrics and safeguards to avoid livelocks, 
 and introduces configuration options so cluster operators can tune memory protection behavior for their environments.
 
-This work was done as part of [KEP #2570](https://kep.k8s.io/2570) led by SIG Node
+This work was done as part of [KEP #2570](https://kep.k8s.io/2570) led by SIG Node.
 
 ## New features in Alpha
 
@@ -417,7 +417,7 @@ This is a selection of some of the improvements that are now alpha following the
 
 ### HPA Scale to Zero for Custom Metrics
 
-Since now, the Horizontal Pod Autoscaler (HPA) required a minimum of at least one replica to remain active, 
+Until now, the Horizontal Pod Autoscaler (HPA) required a minimum of at least one replica to remain active, 
 as it could only calculate scaling needs based on metrics (like CPU or Memory) from running pods. 
 Kubernetes v1.36 continues the development of the HPA Scale to Zero feature (disabled by default) in Alpha, 
 allowing workloads to scale down to zero replicas specifically when using Object or External metrics.
@@ -505,7 +505,7 @@ It brings more consistent performance and reduces Pod startup delays on SELinux-
 
 This feature was introduced as beta in v1.28 for `ReadWriteOncePod` volumes. In v1.32, it gained metrics and an opt-out 
 option (`securityContext.seLinuxChangePolicy: Recursive`) to help catch conflicts. Now in v1.36, 
-it reaches stable and defaults to all volumes, with Pods or CSIDrivers opting in via `spec.SELinuxMount`. 
+it reaches Stable and defaults to all volumes, with Pods or CSIDrivers opting in via `spec.SELinuxMount`. 
 
 However, we expect this feature to create the risk of breaking changes in the future Kubernetes releases, 
 due to the potential for mixing of privileged and unprivileged pods.
