@@ -312,8 +312,8 @@ This work was done as a part of [KEP #3104](https://kep.k8s.io/3104) led by SIG 
 
 ### Mutable Container resources when Job is suspended
 
-In Kubernetes v1.36, the MutablePodResourcesForSuspendedJobs feature for Jobs graduates to beta, 
-relaxing validation to allow updates to container CPU, memory, GPU, and extended resource requests 
+In Kubernetes v1.36, the MutablePodResourcesForSuspendedJobs feature for Jobs graduates to beta.
+This update relaxes Job validation to allow updates to container CPU, memory, GPU, and extended resource requests 
 and limits whil a Job is suspended. This gives queue controllers and operators a safe hook to right‑size 
 batch workloads based on real‑time cluster conditions, rather than locking in resource guesses made at submit time. 
 For example, a queueing system can suspend incoming Jobs, adjust their resource requirements to match 
