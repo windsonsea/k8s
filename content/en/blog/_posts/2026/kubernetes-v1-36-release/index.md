@@ -125,7 +125,7 @@ With GA in v1.36, `ExternalServiceAccountTokenSigner` is now a fully supported o
 centralize identity and signing, simplifying integration with external IAM systems and 
 reducing the need to manage signing keys directly inside the control plane.
 
-This work was done as part of [KEP #740](https://kep.k8s.io/740) led by SIG Auth
+This work was done as part of [KEP #740](https://kep.k8s.io/740) led by SIG Auth.
 
 ### DRA features graduating to Stable
 
