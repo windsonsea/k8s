@@ -11,7 +11,7 @@ author: >
   Bartosz Rejman (Google),
   Jon Huhn (Microsoft),
   Maciej Wyrzuc (Google),
-  TBD
+  Heba Elayoty (Microsoft)
 ---
 
 AI/ML and batch workloads introduce unique scheduling challenges that go beyond simple Pod-by-Pod scheduling.
@@ -328,7 +328,80 @@ utilize DRA for scalable device management.
 
 ## Integration with the Job controller
 
-TBD
+In Kubernetes v1.36, the Job controller can create and manage Workload and PodGroup objects on your behalf,
+so that Jobs representing a tightly coupled parallel application, such as distributed AI training,
+are gang-scheduled without any additional tooling. Without this integration, you would have to
+create the Workload and PodGroup yourself and wire their references into the Pod template.
+Now, the Job controller automates this process natively.
+
+When the [`WorkloadWithJob`](/docs/reference/command-line-tools-reference/feature-gates/#WorkloadWithJob)
+feature gate is enabled, the Job controller automatically:
+
+* creates a `Workload` and a corresponding runtime `PodGroup` for each qualifying Job,
+
+* sets `.spec.schedulingGroup` onto every Pod the Job creates
+  so the scheduler treats them as a single gang, and
+
+* sets the Job as the owner of the generated objects,
+  so they are garbage-collected when the Job is deleted.
+
+### When does the integration kick in?
+
+To keep the first feature iteration predictable, the Job controller only creates a
+Workload and PodGroup when the Job has a well-defined, fixed shape:
+
+* `.spec.parallelism` is greater than 1
+
+* [`.spec.completionMode`](/docs/concepts/workloads/controllers/job/#completion-mode) is set to `Indexed`
+
+* `.spec.completions` is equal to `.spec.parallelism`
+
+* The `schedulingGroup` is not already set on the Pod template.
+
+These conditions describe the class of Jobs that gang scheduling can reason about:
+each Pod has a stable identity (`Indexed`), the gang size is known and fixed at admission time
+(`parallelism` == `completions`), and no other controller has already claimed scheduling responsibility
+(`schedulingGroup` field is unset). Jobs that do not meet these conditions are scheduled Pod-by-Pod,
+exactly as before.
+
+If you set `schedulingGroup` on the Pod template yourself (for example,
+because a higher-level controller is managing the workload), the Job controller leaves
+the Pod template alone and does not create its own Workload or PodGroup. This makes the feature
+safe to enable in clusters that already use an external batch system. 
+
+Here is an example of a Job that qualifies for gang scheduling:
+
+```yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: training-job
+  namespace: job-ns
+spec:
+  completionMode: Indexed
+  parallelism: 4
+  completions: 4
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: worker
+        image: registry.example/trainer:latest
+```
+
+The Job controller creates a Workload and a PodGroup owned by this Job,
+and every Pod it creates carries a `.spec.schedulingGroup` that points at the generated PodGroup.
+The Pods are then scheduled together once all four can be placed at the same time using
+the PodGroup scheduling cycle described earlier in this post.
+
+### What's not covered yet
+
+The current constraints limit this integration to static, indexed, fully-parallel Jobs.
+Support for additional workload shapes, including elastic Jobs and other built-in controllers,
+is tracked in [KEP-5547](https://kep.k8s.io/5547).
+
+In future Kubernetes releases, this integration will expand to support additional workload controllers,
+and the current constraints for Jobs may be relaxed.
 
 ## What's next?
 
@@ -376,7 +449,7 @@ Once the prerequisite is met, you can enable specific features:
   [`DRAWorkloadResourceClaims`](/docs/reference/command-line-tools-reference/feature-gates/#DRAWorkloadResourceClaims)
   feature gate on the `kube-apiserver`, `kube-controller-manager`, `kube-scheduler` and `kubelet`.
 * Workload API integration with the Job controller: Enable the
-  [`EnableWorkloadWithJob`](/docs/reference/command-line-tools-reference/feature-gates/#EnableWorkloadWithJob)
+  [`WorkloadWithJob`](/docs/reference/command-line-tools-reference/feature-gates/#EnableWorkloadWithJob)
   feature gate on the `kube-apiserver` and `kube-controller-manager`.
 
 We encourage you to try out workload-aware scheduling in your test clusters
