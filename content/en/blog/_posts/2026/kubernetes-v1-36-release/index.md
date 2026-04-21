@@ -361,7 +361,7 @@ This low‑overhead z‑page exposes information like start time, uptime, Go ver
 emulation version, and minimum compatibility version, so operators and developers can quickly see exactly 
 what is running without digging through logs or configs. 
 
-The endpoint offers a human‑readable text view by default, plus a versioned structured API (config.k8s.io/Statusz) 
+The endpoint offers a human‑readable text view by default, plus a versioned structured API (`config.k8s.io/Statusz`) 
 for programmatic access in JSON, YAML, or CBOR via explicit content negotiation. 
 Access is restricted to the `system:monitoring` group, keeping it aligned with existing protections on 
 health and metrics endpoints and avoiding exposure of sensitive data. 
