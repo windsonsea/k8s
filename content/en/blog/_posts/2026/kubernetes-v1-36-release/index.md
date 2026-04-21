@@ -298,7 +298,7 @@ This work was done as a part of [KEP #4858](https://kep.k8s.io/4858) led by SIG 
 
 ### Separate kubectl user preferences from cluster configs
 
-In Kubernetes v1.36, the `.kuberc` feature for customizing `kubectl` user preferences graduates to beta 
+The `.kuberc` feature for customizing `kubectl` user preferences continues to be beta 
 and is enabled by default. The `~/.kube/kuberc` file allows users to store aliases, default flags, 
 and other personal settings separately from `kubeconfig` files, which hold cluster endpoints and credentials. 
 This separation prevents personal preferences from interfering with CI pipelines or shared `kubeconfig` files, 
