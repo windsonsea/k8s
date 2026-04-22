@@ -2,7 +2,6 @@
 layout: blog
 title: 'Kubernetes v1.36: ハル (Haru)'
 date: 2026-04-22T10:30:00-08:00
-draft: true
 evergreen: true
 slug: kubernetes-v1-36-release
 author: >
