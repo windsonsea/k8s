@@ -520,7 +520,7 @@ it reaches Stable and defaults to all volumes, with Pods or CSIDrivers opting in
 
 However, we expect this feature to create the risk of breaking changes in the future Kubernetes releases, potentially due to sharing one volume between privileged and unprivileged Pods on the same node.
 
-Developers have that responsibility of setting the `seLinuxChangePolicy` field and SELinux volume labels on Pods. Regardless of whether they are writing a Deployment, StatefulSet, DaemonSet or even a custom resource that includes a Pod template, being careless with these settings can lead to a range of problems such as Pods not starting up correctly when Pods share a volume.
+Developers have the responsibility of setting the `seLinuxChangePolicy` field and SELinux volume labels on Pods. Regardless of whether they are writing a Deployment, StatefulSet, DaemonSet or even a custom resource that includes a Pod template, being careless with these settings can lead to a range of problems such as Pods not starting up correctly when Pods share a volume.
 
 Kubernetes v1.36 is the ideal release to audit your clusters. To learn more, check out [SELinux Volume Label Changes goes GA (and likely implications in v1.37)](/blog/2026/04/22/breaking-changes-in-selinux-volume-labeling/) blog.
 
