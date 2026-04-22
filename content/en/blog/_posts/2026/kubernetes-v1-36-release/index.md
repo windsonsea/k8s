@@ -544,34 +544,35 @@ This release includes a total of 18 enhancements promoted to stable:
 
 ## Deprecations removals, and community updates
 
-As Kubernetes develops and matures, features may be deprecated, removed, or replaced with better ones to improve the 
-project's overall health. See the Kubernetes deprecation and removal policy for more details on this process. 
+As Kubernetes develops and matures, features may be deprecated, removed, or replaced with better ones to improve the
+project's overall health. See the Kubernetes deprecation and removal policy for more details on this process.
 Kubernetes v1.36 includes a couple of deprecations.
 
-### Deprecate service.spec.externalIPs
+### Deprecation of Service .spec.externalIPs {#deprecate-service-spec-externalips}
 
-The `externalIPs` field in Service `spec` is deprecated, which means the functionality exists, but will no longer function in a future version of Kubernetes.
-This field has been a known security headache for years, 
-enabling man-in-the-middle attacks on your cluster traffic, as documented in [CVE-2020-8554](https:/github.com/kubernetes/kubernetes/issues/97076). 
+With this release, the `externalIPs` field in Service `spec` is deprecated. This means the functionality exists, but will no longer function in a **future** version of Kubernetes. You should plan to migrate if you currently rely on that field.
+This field has been a known security headache for years,
+enabling man-in-the-middle attacks on your cluster traffic, as documented in [CVE-2020-8554](https:/github.com/kubernetes/kubernetes/issues/97076).
 From Kubernetes v1.36 and onwards, you will see deprecation warnings when using it, with full removal planned for v1.43.
 
-If your Services still lean on `externalIPs`, consider using LoadBalancer services for cloud-managed ingress, 
-NodePort for simple port exposure, or Gateway API for a more flexible and secure way to handle external traffic.
+If your Services still lean on `externalIPs`, consider using LoadBalancer services for cloud-managed ingress,
+NodePort for simple port exposure, or [Gateway API](https://gateway-api.sigs.k8s.io/) for a more flexible and secure way to handle external traffic.
 
-For more details on this enhancement, refer to [KEP-5707: Deprecate service.spec.externalIPs](https://kep.k8s.io/5707)
+For more details on this field and its deprecation, refer to [External IPs](/docs/concepts/services-networking/service/#external-ips) or read
+[KEP-5707: Deprecate service.spec.externalIPs](https://kep.k8s.io/5707).
 
-### Remove gitRepo volume driver
+### Removal of the `gitRepo` volume driver {#remove-gitrepo-volume-driver}
 
-The gitRepo volume type has been deprecated since v1.11. Starting Kubernetes v1.36, the `gitRepo` volume plugin is 
-permanently disabled and cannot be turned back on. This change protects clusters from a critical security issue where 
-using `gitRepo` could let an attacker run code as root on the node. 
+The `gitRepo` volume type has been deprecated since v1.11. For Kubernetes v1.36, the `gitRepo` volume plugin is
+permanently disabled and cannot be turned back on. This change protects clusters from a critical security issue where
+using `gitRepo` could let an attacker run code as root on the node.
 
-Although `gitRepo` has been deprecated for years and better alternatives have been recommended, 
+Although `gitRepo` has been deprecated for years and better alternatives have been recommended,
 it was still technically possible to use it in previous releases.
 From v1.36 onward, that path is closed for good, so any existing workloads depending on `gitRepo` will need to migrate to
-supported approaches such as init containers or external git-sync style tools.
+supported approaches such as init containers or external `git-sync` style tools.
 
-For more details on this enhancement, refer to [KEP-5040: Remove gitRepo volume driver](https://kep.k8s.io/5040)
+For more details on this removal, refer to [KEP-5040: Remove gitRepo volume driver](https://kep.k8s.io/5040)
 
 ## Release notes
 
