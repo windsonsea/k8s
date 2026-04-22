@@ -23,9 +23,9 @@ There are also some [deprecations and removals](#deprecations-removals-and-commu
 
 {{< figure src="k8s-v1.36.svg" alt="Kubernetes v1.36 Haru logo: a hex badge with the title Haru in flowing script beneath v1.36; Mount Fuji rises on the right, its peak lit red with streaks of pale snow, the Japanese calligraphy 晴れに翔け brushed down its slope; a white Kubernetes helm floats in the blue sky to the left among stylised clouds in the ukiyo-e manner; in the foreground stand two cats as paired guardians, a grey-and-white cat on the left and a ginger tabby on the right, each wearing a collar with a small blue Kubernetes helm charm" class="release-logo" >}}
 
-We open 2026 with Kubernetes v1.36, a release that arrives as the season turns and the days grow lighter. ハル (_Haru_) is a sound in Japanese that carries many meanings; among those we hold closest are 春 (spring), 晴 (_hare_, clear skies), and 遥か (_haruka_, far-off, distant). A season, a sky, and a horizon. You will find all three in what follows.
+We open 2026 with Kubernetes v1.36, a release that arrives as the season turns and the days grow lighter. ハル (_Haru_) is a sound in Japanese that carries many meanings; among those we hold closest are 春 (spring), 晴れ (_hare_, clear skies), and 遥か (_haruka_, far-off, distant). A season, a sky, and a horizon. You will find all three in what follows.
 
-The logo, created by [avocadoneko / Natsuho Ide](https://x.com/avocadoneko), draws inspiration from [Katsushika Hokusai](https://en.wikipedia.org/wiki/Hokusai)'s [_Thirty-six Views of Mount Fuji_](https://en.wikipedia.org/wiki/Thirty-six_Views_of_Mount_Fuji) (富嶽三十六景, _Fugaku Sanjūrokkei_), the same series that gave the world [_The Great Wave off Kanagawa_](https://en.wikipedia.org/wiki/The_Great_Wave_off_Kanagawa). Our v1.36 logo reimagines one of the series' most celebrated prints, [_Fine Wind, Clear Morning_](https://en.wikipedia.org/wiki/Fine_Wind,_Clear_Morning) (凱風快晴, _Gaifū Kaisei_), also known as Red Fuji (赤富士, _Aka Fuji_): the mountain lit red in a summer dawn, bare of snow after the long thaw. Thirty-six views felt like a fitting number to sit with at v1.36, and a reminder that even Hokusai didn't stop there.[^1] Keeping watch over the scene is the Kubernetes helm, set into the sky alongside the mountain.
+The logo, created by [avocadoneko / Natsuho Ide](https://x.com/avocadoneko), draws inspiration from [Katsushika Hokusai](https://en.wikipedia.org/wiki/Hokusai)'s [_Thirty-six Views of Mount Fuji_](https://en.wikipedia.org/wiki/Thirty-six_Views_of_Mount_Fuji) (富嶽三十六景, _Fugaku Sanjūrokkei_), the same series that gave the world [_The Great Wave off Kanagawa_](https://en.wikipedia.org/wiki/The_Great_Wave_off_Kanagawa). Our v1.36 logo reimagines one of the series' most celebrated prints, [_Fine Wind, Clear Morning_](https://en.wikipedia.org/wiki/Fine_Wind,_Clear_Morning) (凱風快晴, _Gaifū Kaisei_), also known as Red Fuji (赤富士, _Aka Fuji_): the mountain lit red in a summer dawn, bare of snow after the long thaw. Thirty-six views felt like a fitting number to sit with at v1.36, and a reminder that even Hokusai didn't stop there.<sup>1</sup> Keeping watch over the scene is the Kubernetes helm, set into the sky alongside the mountain.
 
 At the foot of Fuji sit Stella (left) and Nacho (right), two cats with the Kubernetes helm on their collars, standing in for the role of [_komainu_](https://en.wikipedia.org/wiki/Komainu), the paired lion-dog guardians that watch over Japanese shrines. Paired, because nothing is guarded alone. Stella and Nacho stand in for a very much larger set of paws: the SIGs and working groups, the maintainers and reviewers, the people behind docs, blogs, and translations, the release team, first-time contributors taking their first steps, and lifelong contributors returning season after season. Kubernetes v1.36 is, as always, held up by many hands.
 
@@ -33,13 +33,12 @@ Brushed across Red Fuji in the logo is the calligraphy 晴れに翔け (_hare ni
 
 > **晴れに翔け、未来よ明け**\
 > _hare ni kake, asu yo ake_\
-> "Soar into clear skies; toward tomorrow's sunrise."[^2]
+> "Soar into clear skies; toward tomorrow's sunrise."<sup>2</sup>
 
 That is the wish we carry for this release: to soar into clear skies, for the release itself, for the project, and for everyone who ships it together. The dawn breaking over Red Fuji is not an ending but a passage: this release carries us to the next, and that one to the one after, on toward horizons far beyond what any single view can hold.
 
-[^1]: The series was so popular that Hokusai added ten more prints, bringing the total to forty-six.
-
-[^2]: 未来 means "the future" in its widest sense, not just tomorrow but everything still to come. It is usually read _mirai_; here it takes the informal reading _asu_.
+<sub>1. The series was so popular that Hokusai added ten more prints, bringing the total to forty-six.</sub>\
+<sub>2. 未来 means "the future" in its widest sense, not just tomorrow but everything still to come. It is usually read _mirai_; here it takes the informal reading _asu_.</sub>
 
 ## Spotlight on key updates
 
