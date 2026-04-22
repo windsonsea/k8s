@@ -516,7 +516,7 @@ It brings more consistent performance and reduces Pod startup delays on SELinux-
 
 This feature was introduced as beta in v1.28 for `ReadWriteOncePod` volumes. In v1.32, it gained metrics and an opt-out 
 option (`securityContext.seLinuxChangePolicy: Recursive`) to help catch conflicts. Now in v1.36, 
-it reaches Stable and defaults to all volumes, with Pods or CSIDrivers opting in via `spec.SELinuxMount`. 
+it reaches Stable and defaults to all volumes, with Pods or CSIDrivers opting in via `spec.seLinuxMount`.
 
 However, we expect this feature to create the risk of breaking changes in the future Kubernetes releases, potentially due to sharing one volume between privileged and unprivileged Pods on the same node.
 
