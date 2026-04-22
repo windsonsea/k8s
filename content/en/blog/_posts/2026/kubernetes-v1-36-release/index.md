@@ -1,13 +1,11 @@
 ---  
 layout: blog
-title: 'Kubernetes v1.36: ハル (Haru)'
-date: 2026-04-22T10:30:00-08:00
+title: "Kubernetes v1.36: ハル (Haru)"
+date: 2026-04-22
 evergreen: true
 slug: kubernetes-v1-36-release
 author: >
   [Kubernetes v1.36 Release Team](https://github.com/kubernetes/sig-release/blob/master/releases/release-1.36/release-team.md)
-release_announcement:
-  minor_version: "1.36"
 ---
 
 **Editors:** Chad M. Crowell, Kirti Goyal, Sophia Ugochukwu, Swathi Rao, Utkarsh Umre
