@@ -1,5 +1,5 @@
 ---
-title: EnableWorkloadWithJob
+title: WorkloadWithJob
 content_type: feature_gate
 _build:
   list: never
