@@ -15,7 +15,7 @@ release_announcement:
 
 Similar to previous releases, the release of Kubernetes v1.36 introduces new stable, beta, and alpha features. The consistent delivery of high-quality releases underscores the strength of our development cycle and the vibrant support from our community.
 
-This release consists of 69 enhancements. Of those enhancements, 18 have graduated to Stable, 24 are entering Beta, and 25 have graduated to Alpha.
+This release consists of 70 enhancements. Of those enhancements, 18 have graduated to Stable, 25 are entering Beta, and 25 have graduated to Alpha.
 
 There are also some [deprecations and removals](#deprecations-removals-and-community-updates) in this release; make sure to read about those.
 
