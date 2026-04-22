@@ -12,7 +12,7 @@ schedules:
     targetDate: "2026-05-13"
   previousPatches: []
   release: "1.36"
-  releaseDate: "2026-04-20"
+  releaseDate: "2026-04-22"
 - endOfLifeDate: "2027-02-28"
   maintenanceModeStartDate: "2026-12-28"
   next:
