@@ -21,7 +21,7 @@ There are also some [deprecations and removals](#deprecations-removals-and-commu
 
 ## Release theme and logo
 
-{{< figure src="k8s-v1.36.png" alt="Kubernetes v1.36 Haru logo: a hex badge with the title Haru in flowing script beneath v1.36; Mount Fuji rises on the right, its peak lit red with streaks of pale snow, the Japanese calligraphy 晴れに翔け brushed down its slope; a white Kubernetes helm floats in the blue sky to the left among stylised clouds in the ukiyo-e manner; in the foreground stand two cats as paired guardians, a grey-and-white cat on the left and a ginger tabby on the right, each wearing a collar with a small blue Kubernetes helm charm" class="release-logo" >}}
+{{< figure src="k8s-v1.36.svg" alt="Kubernetes v1.36 Haru logo: a hex badge with the title Haru in flowing script beneath v1.36; Mount Fuji rises on the right, its peak lit red with streaks of pale snow, the Japanese calligraphy 晴れに翔け brushed down its slope; a white Kubernetes helm floats in the blue sky to the left among stylised clouds in the ukiyo-e manner; in the foreground stand two cats as paired guardians, a grey-and-white cat on the left and a ginger tabby on the right, each wearing a collar with a small blue Kubernetes helm charm" class="release-logo" >}}
 
 We open 2026 with Kubernetes v1.36, a release that arrives as the season turns and the days grow lighter. ハル (_Haru_) is a sound in Japanese that carries many meanings; among those we hold closest are 春 (spring), 晴 (_hare_, clear skies), and 遥か (_haruka_, far-off, distant). A season, a sky, and a horizon. You will find all three in what follows.
 
