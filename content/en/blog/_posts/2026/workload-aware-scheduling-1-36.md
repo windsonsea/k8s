@@ -337,7 +337,7 @@ Now, the Job controller automates this process natively.
 When the [`WorkloadWithJob`](/docs/reference/command-line-tools-reference/feature-gates/#WorkloadWithJob)
 feature gate is enabled, the Job controller automatically:
 
-* creates a `Workload` and a corresponding runtime `PodGroup` for each qualifying Job,
+* creates a Workload and a corresponding runtime PodGroup for each qualifying Job,
 
 * sets `.spec.schedulingGroup` onto every Pod the Job creates
   so the scheduler treats them as a single gang, and
@@ -457,9 +457,8 @@ and share your experiences to help shape the future of Kubernetes scheduling.
 You can send your feedback by:
 
 * Reaching out via [Slack (#workload-aware-scheduling)](https://kubernetes.slack.com/archives/C0AHLJ0EAEL).
-* Joining the [SIG Scheduling](https://docs.google.com/document/d/13mwye7nvrmV11q9_Eg77z-1w3X7Q1GTbslpml4J7F3A/edit)
-  or [Workload API integration](https://docs.google.com/document/d/1XSPdK4L3zkAFhAZ3hBQJr2k7JX9CpGD7NeQfujM1PT4/edit) meetings.
-* Filing a new [issue](https://github.com/kubernetes/enhancements/issues) in the Kubernetes repository.
+* Joining the [SIG Scheduling](https://www.kubernetes.dev/community/community-groups/sigs/scheduling/#meetings) meetings.
+* Filing a new [issue](https://github.com/kubernetes/kubernetes/issues) in the Kubernetes repository.
 
 ## Learn more
 
