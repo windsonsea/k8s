@@ -369,7 +369,7 @@ This work was done across several KEPs (including [#5004](https://kep.k8s.io/500
 
 In Kubernetes v1.36, the `ComponentStatusz` feature gate for core Kubernetes components graduates to beta,
 providing a `/statusz` endpoint (enabled by default) that surfaces real‑time build and version details for each component.
-This low‑overhead [z-page](docs/reference/instrumentation/zpages/) exposes information like start time, uptime, Go version, binary version,
+This low‑overhead [z-page](/docs/reference/instrumentation/zpages/) exposes information like start time, uptime, Go version, binary version,
 emulation version, and minimum compatibility version, so operators and developers can quickly see exactly
 what is running without digging through logs or configs.
 
@@ -567,7 +567,7 @@ Kubernetes v1.36 includes a couple of deprecations.
 
 With this release, the `externalIPs` field in Service `spec` is deprecated. This means the functionality exists, but will no longer function in a **future** version of Kubernetes. You should plan to migrate if you currently rely on that field.
 This field has been a known security headache for years,
-enabling man-in-the-middle attacks on your cluster traffic, as documented in [CVE-2020-8554](https:/github.com/kubernetes/kubernetes/issues/97076).
+enabling man-in-the-middle attacks on your cluster traffic, as documented in [CVE-2020-8554](https://github.com/kubernetes/kubernetes/issues/97076).
 From Kubernetes v1.36 and onwards, you will see deprecation warnings when using it, with full removal planned for v1.43.
 
 If your Services still lean on `externalIPs`, consider using LoadBalancer services for cloud-managed ingress,
