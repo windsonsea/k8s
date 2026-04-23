@@ -14,17 +14,17 @@ authors: >
 ![Gateway API logo](gateway-api-logo.svg)
 
 The Kubernetes SIG Network community presents the release of Gateway API (v1.5)!
-Released on March 14, 2026, version 1.5 is our biggest release yet, and concentrates on moving existing Experimental features to Standard (Stable).
+Released on February 27, 2026, version 1.5 is our biggest release yet, and concentrates on moving existing Experimental features to Standard (Stable).
 
-The Gateway API [v1.5.1](https://github.com/kubernetes-sigs/gateway-api/releases/tag/v1.5.1) patch release is already available
+The Gateway API [v1.5.1](https://github.com/kubernetes-sigs/gateway-api/releases/tag/v1.5.1) patch release is already available.
 
 The Gateway API v1.5 brings six widely-requested feature promotions to the Standard channel (Gateway API's GA release channel):
 * ListenerSet
-* TLSRoute promoted to Stable
+* TLSRoute
 * HTTPRoute CORS Filter
 * Client Certificate Validation
 * Certificate Selection for Gateway TLS Origination
-* ReferenceGrant promoted to Stable
+* ReferenceGrant
 
 Special thanks for [Gateway API Contributors](https://github.com/kubernetes-sigs/gateway-api/blob/a811d174a406553006bbb9a3594b49380cb9069e/CHANGELOG/1.5-TEAM.md) for their efforts on this release.
 
