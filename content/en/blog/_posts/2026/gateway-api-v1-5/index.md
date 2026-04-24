@@ -468,3 +468,5 @@ The maintainers would like to thank **everyone** who's contributed to Gateway
 API, whether in the form of commits to the repo, discussion, ideas, or general
 support. We could never have made this kind of progress without the support of
 this dedicated and active community.
+
+_This article was edited in April 2026 to correct the release date for Gateway API 1.5.0._
