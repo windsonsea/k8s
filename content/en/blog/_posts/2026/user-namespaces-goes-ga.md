@@ -1,6 +1,6 @@
 ---
 layout: blog
-title: "Kubernetes v1.36: User Namespaces in Kubernetes: Finally GA"
+title: "Kubernetes v1.36: User Namespaces in Kubernetes are finally GA"
 date: 2026-04-23T10:35:00-08:00
 slug: kubernetes-v1-36-userns-ga
 author: >
