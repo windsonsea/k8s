@@ -1,9 +1,8 @@
 ---
 layout: blog
 title: "Kubernetes v1.36：用户命名空间终于正式可用"
-date: 2026-04-22
+date: 2026-04-23T10:35:00-08:00
 slug: userns-ga
-draft: true
 author: >
   Rodrigo Campos Catelin (Amutable),
   Giuseppe Scrivano (Red Hat)
@@ -13,9 +12,8 @@ translator: >
 <!--
 layout: blog
 title: "User Namespaces in Kubernetes: Finally GA"
-date: 2026-04-22
+date: 2026-04-23T10:35:00-08:00
 slug: userns-ga
-draft: true
 author: >
   Rodrigo Campos Catelin (Amutable),
   Giuseppe Scrivano (Red Hat)
